@@ -204,6 +204,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             z-index: 10000;
             animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+            min-width: 250px;
         }
 
         .toast.success {
@@ -342,8 +344,8 @@
             background: white;
             border-radius: 20px;
             width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
+            max-width: 800px;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideDown 0.3s ease-out;
@@ -352,16 +354,17 @@
         /* גלריית תבניות */
         .template-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
         }
 
         .template-card {
             aspect-ratio: 16/9;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
             border: 3px solid transparent;
+            min-height: 140px;
         }
 
         .template-card:hover {
@@ -392,8 +395,8 @@
             background: white;
             border-radius: 20px;
             width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
+            max-width: 800px;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideDown 0.3s ease-out;
@@ -1438,6 +1441,8 @@ ${currentSlides}
             }
 
             async generateFullPresentation(userPrompt) {
+                console.log('[v0] Starting presentation generation...');
+                
                 const systemInstructions = `אתה מעצב מצגות מקצועי עם יכולות עיצוב מתקדמות.
 
 אפשרויות העיצוב שלך כוללות:
@@ -1493,7 +1498,9 @@ ${currentSlides}
 6. החזר ONLY JSON, ללא טקסט נוסף`;
 
                 try {
+                    console.log('[v0] Calling Gemini API...');
                     const response = await this.callGemini('', systemInstructions);
+                    console.log('[v0] Received response from Gemini');
                     
                     // חילוץ JSON מהתגובה
                     const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -1501,11 +1508,13 @@ ${currentSlides}
                         throw new Error('לא התקבלה תגובה תקינה מה-AI');
                     }
                     
+                    console.log('[v0] Parsing JSON...');
                     const presentationData = JSON.parse(jsonMatch[0]);
                     
                     // ניקוי שקפים קיימים
                     app.slides.slides = [];
                     
+                    console.log('[v0] Creating slides...');
                     // יצירת השקפים
                     let imageCount = 0;
                     const maxImages = 3; // מגבלה של 3 תמונות
@@ -1522,11 +1531,12 @@ ${currentSlides}
                         
                         if (slideData.imagePrompt && imageCount < maxImages) {
                             try {
+                                console.log(`[v0] Generating image ${imageCount + 1}/${maxImages}...`);
                                 const imageUrl = await this.generateImage(slideData.imagePrompt);
                                 slide.image = imageUrl;
                                 imageCount++;
                             } catch (error) {
-                                console.error('שגיאה ביצירת תמונה:', error);
+                                console.error('[v0] Error generating image:', error);
                                 // אם יש שגיאה, פשוט אל תוסיף תמונה
                             }
                         }
@@ -1534,6 +1544,7 @@ ${currentSlides}
                         app.slides.slides.push(slide);
                     }
                     
+                    console.log('[v0] Rendering slides...');
                     app.slides.renderSlides();
                     
                     // שמירת המצגת בהיסטוריה
@@ -1543,8 +1554,10 @@ ${currentSlides}
                         createdAt: new Date()
                     });
                     
+                    console.log('[v0] Presentation generation complete!');
+                    
                 } catch (error) {
-                    console.error('Error generating presentation:', error);
+                    console.error('[v0] Error generating presentation:', error);
                     throw error;
                 }
             }
@@ -1762,6 +1775,8 @@ ${currentSlides}
                     z-index: 10000;
                     font-weight: 600;
                     animation: slideIn 0.3s ease-out;
+                    max-width: 400px;
+                    min-width: 250px;
                 `;
                 toast.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -1931,14 +1946,12 @@ ${currentSlides}
                 const templates = app.templates.getAllTemplates();
                 grid.innerHTML = templates.map(template => `
                     <div class="template-card" 
-                         style="background: ${template.preview}; min-height: 120px; border-radius: 12px; cursor: pointer; padding: 20px; transition: all 0.3s ease;"
+                         style="background: ${template.preview}; height: 140px; border-radius: 12px; cursor: pointer; padding: 20px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;"
                          onclick="app.ui.applyTemplate('${template.id}')"
-                         onmouseover="this.style.transform='scale(1.05)'"
-                         onmouseout="this.style.transform='scale(1)'">
-                        <div class="h-full flex items-center justify-center">
-                            <div class="bg-white bg-opacity-90 backdrop-blur-sm px-4 py-2 rounded-lg">
-                                <p class="font-bold text-gray-800 text-center">${template.name}</p>
-                            </div>
+                         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)'"
+                         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                        <div class="bg-white bg-opacity-90 backdrop-blur-sm px-4 py-2 rounded-lg">
+                            <p class="font-bold text-gray-800 text-center">${template.name}</p>
                         </div>
                     </div>
                 `).join('');
@@ -2718,8 +2731,18 @@ ${currentSlides}
             console.log('SlideGenius AI Pro - Loaded Successfully!');
             console.log('Total lines: 1900+');
             
-            // עדכון סטטוס API key
-            app.settings.updateApiKeyStatus();
+            const hasApiKey = app.settings.apiKey && app.settings.apiKey.trim() !== '';
+            
+            if (!hasApiKey) {
+                // אם אין מפתח API - פתיחת ההגדרות אוטומטית
+                setTimeout(() => {
+                    app.ui.showSettings();
+                    app.ui.showToast('נא להזין מפתח API של Gemini כדי להתחיל', 'info');
+                }, 500);
+            } else {
+                // עדכון סטטוס API key
+                app.settings.updateApiKeyStatus();
+            }
             
             // בדיקה אם יש מפתח API
             const apiKeyInput = document.getElementById('apiKeyInput');
