@@ -262,11 +262,133 @@
         }
 
         /* רספונסיביות */
-        @media (max-width: 768px) {
-            .slide-canvas {
-                max-width: 100%;
-            }
+        /* שיפור רספונסיביות לכל גדלי מסך */
+    @media (max-width: 1400px) {
+        .main-container {
+            padding: 1rem;
         }
+        
+        .slide-canvas {
+            max-width: 90%;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .editor-container {
+            flex-direction: column;
+        }
+        
+        .slides-sidebar {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .slide-editor {
+            width: 100%;
+        }
+        
+        .toolbar {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .toolbar button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .slide-canvas {
+            max-width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+        }
+        
+        .modal-content {
+            width: 95%;
+            max-width: none;
+            margin: 1rem;
+        }
+        
+        .header {
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+        }
+        
+        .btn-group {
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        .btn-group button {
+            flex: 1;
+            min-width: 120px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-title {
+            font-size: 1.25rem;
+        }
+        
+        .toolbar {
+            flex-direction: column;
+        }
+        
+        .toolbar button {
+            width: 100%;
+        }
+        
+        .notification {
+            width: 95%;
+            font-size: 0.875rem;
+        }
+    }
+
+    /* שיפור תצוגת הודעות */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        max-width: 400px;
+        min-width: 300px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .notification.success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .notification.error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
 
         /* עיצובים דינמיים */
         .pattern-dots {
@@ -1000,7 +1122,7 @@
                     { id: 'moroccan', style: 'radial-gradient(circle at 100% 150%, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 28%, transparent 29%, transparent 36%, rgba(0,0,0,0.05) 36%, rgba(0,0,0,0.05) 40%, transparent 40%, transparent), radial-gradient(circle at 0 150%, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 28%, transparent 29%, transparent 36%, rgba(0,0,0,0.05) 36%, rgba(0,0,0,0.05) 40%, transparent 40%, transparent)', size: '60px 60px' },
                     { id: 'bubbles', style: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 5%, transparent 5%), radial-gradient(circle at 60% 70%, rgba(255,255,255,0.1) 8%, transparent 8%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 6%, transparent 6%)', size: '100px 100px' },
                     { id: 'carbon', style: 'linear-gradient(27deg, rgba(0,0,0,0.05) 5%, transparent 5%), linear-gradient(207deg, rgba(0,0,0,0.05) 5%, transparent 5%), linear-gradient(127deg, transparent 5%, rgba(0,0,0,0.05) 5%)', size: '10px 10px' },
-                    { id: 'blueprint', style: 'linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', size: '100px 100px, 100px 100px, 20px 20px, 20px 20px', position: '-2px -2px, -2px -2px, -1px -1px, -1px -1px' },
+                    { id: 'blueprint', style: 'linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)', size: '100px 100px, 100px 100px, 20px 20px, 20px 20px', position: '-2px -2px, -2px -2px, -1px -1px, -1px -1px' },
                     { id: 'honeycomb', style: 'radial-gradient(circle farthest-side at 0% 50%, rgba(0,0,0,0) 23.5%, rgba(0,0,0,0.05) 0), radial-gradient(circle farthest-side at 0% 50%, rgba(0,0,0,0.05) 24%, rgba(0,0,0,0) 0)', size: '20px 20px' },
                     { id: 'stars', style: 'radial-gradient(2px 2px at 20px 30px, white, transparent), radial-gradient(2px 2px at 60px 70px, white, transparent), radial-gradient(1px 1px at 50px 50px, white, transparent)', size: '80px 80px' },
                     { id: 'diamond', style: 'linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.05) 60%, transparent 60%), linear-gradient(-45deg, transparent 40%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.05) 60%, transparent 60%)', size: '40px 40px' },
@@ -1176,181 +1298,7 @@
                     { id: 'glitch', name: 'Glitch', duration: '0.5s', css: 'transform, opacity' },
                     { id: 'pixelate', name: 'Pixelate', duration: '0.8s', css: 'filter' }
                 ];
-
-                this.animations = [
-                    // Entrance הנפשות - Fade (10)
-                    { id: 'fade-in', name: 'Fade In', type: 'entrance', duration: '0.5s' },
-                    { id: 'fade-in-up', name: 'Fade In Up', type: 'entrance', duration: '0.6s' },
-                    { id: 'fade-in-down', name: 'Fade In Down', type: 'entrance', duration: '0.6s' },
-                    { id: 'fade-in-left', name: 'Fade In Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'fade-in-right', name: 'Fade In Right', type: 'entrance', duration: '0.6s' },
-                    { id: 'fade-in-up-big', name: 'Fade In Up Big', type: 'entrance', duration: '0.8s' },
-                    { id: 'fade-in-down-big', name: 'Fade In Down Big', type: 'entrance', duration: '0.8s' },
-                    { id: 'fade-in-left-big', name: 'Fade In Left Big', type: 'entrance', duration: '0.8s' },
-                    { id: 'fade-in-right-big', name: 'Fade In Right Big', type: 'entrance', duration: '0.8s' },
-                    { id: 'fade-in-top-left', name: 'Fade In Top Left', type: 'entrance', duration: '0.7s' },
-                    
-                    // Entrance הנפשות - Zoom (10)
-                    { id: 'zoom-in', name: 'Zoom In', type: 'entrance', duration: '0.5s' },
-                    { id: 'zoom-in-up', name: 'Zoom In Up', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-in-down', name: 'Zoom In Down', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-in-left', name: 'Zoom In Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-in-right', name: 'Zoom In Right', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-out', name: 'Zoom Out', type: 'entrance', duration: '0.5s' },
-                    { id: 'zoom-out-up', name: 'Zoom Out Up', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-out-down', name: 'Zoom Out Down', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-out-left', name: 'Zoom Out Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'zoom-out-right', name: 'Zoom Out Right', type: 'entrance', duration: '0.6s' },
-                    
-                    // Entrance הנפשות - Slide (10)
-                    { id: 'slide-in-up', name: 'Slide In Up', type: 'entrance', duration: '0.6s' },
-                    { id: 'slide-in-down', name: 'Slide In Down', type: 'entrance', duration: '0.6s' },
-                    { id: 'slide-in-left', name: 'Slide In Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'slide-in-right', name: 'Slide In Right', type: 'entrance', duration: '0.6s' },
-                    { id: 'slide-in-blurred-top', name: 'Slide In Blurred Top', type: 'entrance', duration: '0.8s' },
-                    { id: 'slide-in-blurred-bottom', name: 'Slide In Blurred Bottom', type: 'entrance', duration: '0.8s' },
-                    { id: 'slide-in-blurred-left', name: 'Slide In Blurred Left', type: 'entrance', duration: '0.8s' },
-                    { id: 'slide-in-blurred-right', name: 'Slide In Blurred Right', type: 'entrance', duration: '0.8s' },
-                    { id: 'slide-in-elliptic-top', name: 'Slide In Elliptic Top', type: 'entrance', duration: '0.7s' },
-                    { id: 'slide-in-elliptic-bottom', name: 'Slide In Elliptic Bottom', type: 'entrance', duration: '0.7s' },
-                    
-                    // Entrance הנפשות - Rotate (10)
-                    { id: 'rotate-in', name: 'Rotate In', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-up-left', name: 'Rotate In Up Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-up-right', name: 'Rotate In Up Right', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-down-left', name: 'Rotate In Down Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-down-right', name: 'Rotate In Down Right', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-center', name: 'Rotate In Center', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-2-cw', name: 'Rotate In 2 CW', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-2-ccw', name: 'Rotate In 2 CCW', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-diagonal-1', name: 'Rotate In Diagonal 1', type: 'entrance', duration: '0.6s' },
-                    { id: 'rotate-in-diagonal-2', name: 'Rotate In Diagonal 2', type: 'entrance', duration: '0.6s' },
-                    
-                    // Entrance הנפשות - Flip (10)
-                    { id: 'flip-in-hor-bottom', name: 'Flip In Horizontal Bottom', type: 'entrance', duration: '0.5s' },
-                    { id: 'flip-in-hor-top', name: 'Flip In Horizontal Top', type: 'entrance', duration: '0.5s' },
-                    { id: 'flip-in-ver-left', name: 'Flip In Vertical Left', type: 'entrance', duration: '0.5s' },
-                    { id: 'flip-in-ver-right', name: 'Flip In Vertical Right', type: 'entrance', duration: '0.5s' },
-                    { id: 'flip-in-diag-1-tl', name: 'Flip In Diagonal TL', type: 'entrance', duration: '0.6s' },
-                    { id: 'flip-in-diag-1-tr', name: 'Flip In Diagonal TR', type: 'entrance', duration: '0.6s' },
-                    { id: 'flip-in-diag-1-bl', name: 'Flip In Diagonal BL', type: 'entrance', duration: '0.6s' },
-                    { id: 'flip-in-diag-1-br', name: 'Flip In Diagonal BR', type: 'entrance', duration: '0.6s' },
-                    { id: 'flip-in-3d-hor', name: 'Flip In 3D Horizontal', type: 'entrance', duration: '0.7s' },
-                    { id: 'flip-in-3d-ver', name: 'Flip In 3D Vertical', type: 'entrance', duration: '0.7s' },
-                    
-                    // Entrance הנפשות - Bounce (10)
-                    { id: 'bounce-in', name: 'Bounce In', type: 'emphasis', duration: '0.8s' },
-                    { id: 'bounce-in-up', name: 'Bounce In Up', type: 'emphasis', duration: '0.8s' },
-                    { id: 'bounce-in-down', name: 'Bounce In Down', type: 'emphasis', duration: '0.8s' },
-                    { id: 'bounce-in-left', name: 'Bounce In Left', type: 'emphasis', duration: '0.8s' },
-                    { id: 'bounce-in-right', name: 'Bounce In Right', type: 'emphasis', duration: '0.8s' },
-                    { id: 'bounce-in-fwd', name: 'Bounce In Forward', type: 'emphasis', duration: '1s' },
-                    { id: 'bounce-in-bck', name: 'Bounce In Backward', type: 'emphasis', duration: '1s' },
-                    { id: 'bounce-in-top', name: 'Bounce In Top', type: 'emphasis', duration: '1.1s' },
-                    { id: 'bounce-in-bottom', name: 'Bounce In Bottom', type: 'emphasis', duration: '1.1s' },
-                    { id: 'bounce-in-rotate', name: 'Bounce In Rotate', type: 'emphasis', duration: '1s' },
-                    
-                    // Entrance הנפשות - Roll (5)
-                    { id: 'roll-in-left', name: 'Roll In Left', type: 'entrance', duration: '0.6s' },
-                    { id: 'roll-in-right', name: 'Roll In Right', type: 'entrance', duration: '0.6s' },
-                    { id: 'roll-in-top', name: 'Roll In Top', type: 'entrance', duration: '0.6s' },
-                    { id: 'roll-in-bottom', name: 'Roll In Bottom', type: 'entrance', duration: '0.6s' },
-                    { id: 'roll-in-blurred', name: 'Roll In Blurred', type: 'entrance', duration: '0.65s' },
-                    
-                    // Entrance הנפשות - Swing (5)
-                    { id: 'swing-in-top-fwd', name: 'Swing In Top Forward', type: 'entrance', duration: '0.6s' },
-                    { id: 'swing-in-top-bck', name: 'Swing In Top Backward', type: 'entrance', duration: '0.6s' },
-                    { id: 'swing-in-bottom-fwd', name: 'Swing In Bottom Forward', type: 'entrance', duration: '0.6s' },
-                    { id: 'swing-in-bottom-bck', name: 'Swing In Bottom Backward', type: 'entrance', duration: '0.6s' },
-                    { id: 'swing-in-left', name: 'Swing In Left', type: 'entrance', duration: '0.7s' },
-                    
-                    // Entrance הנפשות - Scale (10)
-                    { id: 'scale-in-center', name: 'Scale In Center', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-top', name: 'Scale In Top', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-bottom', name: 'Scale In Bottom', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-left', name: 'Scale In Left', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-right', name: 'Scale In Right', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-tl', name: 'Scale In Top Left', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-tr', name: 'Scale In Top Right', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-bl', name: 'Scale In Bottom Left', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-br', name: 'Scale In Bottom Right', type: 'entrance', duration: '0.5s' },
-                    { id: 'scale-in-ver-center', name: 'Scale In Vertical Center', type: 'entrance', duration: '0.4s' },
-                    
-                    // Entrance הנפשות - Puff (5)
-                    { id: 'puff-in-center', name: 'Puff In Center', type: 'entrance', duration: '0.7s' },
-                    { id: 'puff-in-top', name: 'Puff In Top', type: 'entrance', duration: '0.7s' },
-                    { id: 'puff-in-bottom', name: 'Puff In Bottom', type: 'entrance', duration: '0.7s' },
-                    { id: 'puff-in-left', name: 'Puff In Left', type: 'entrance', duration: '0.7s' },
-                    { id: 'puff-in-right', name: 'Puff In Right', type: 'entrance', duration: '0.7s' },
-                    
-                    // Entrance הנפשות - Blur (5)
-                    { id: 'blur-in', name: 'Blur In', type: 'entrance', duration: '0.6s' },
-                    { id: 'focus-in-expand', name: 'Focus In Expand', type: 'entrance', duration: '0.8s' },
-                    { id: 'focus-in-contract', name: 'Focus In Contract', type: 'entrance', duration: '0.7s' },
-                    { id: 'focus-in-contract-bck', name: 'Focus In Contract Backward', type: 'entrance', duration: '1s' },
-                    { id: 'text-focus-in', name: 'Text Focus In', type: 'entrance', duration: '1s' },
-                    
-                    // Emphasis הנפשות - Pulse (10)
-                    { id: 'pulse', name: 'Pulse', type: 'emphasis', duration: '0.5s' },
-                    { id: 'pulse-grow', name: 'Pulse Grow', type: 'emphasis', duration: '0.6s' },
-                    { id: 'pulse-shrink', name: 'Pulse Shrink', type: 'emphasis', duration: '0.6s' },
-                    { id: 'heartbeat', name: 'Heartbeat', type: 'emphasis', duration: '1.3s' },
-                    { id: 'pulsate', name: 'Pulsate', type: 'emphasis', duration: '1.5s' },
-                    { id: 'pulsate-fwd', name: 'Pulsate Forward', type: 'emphasis', duration: '0.5s' },
-                    { id: 'pulsate-bck', name: 'Pulsate Backward', type: 'emphasis', duration: '0.5s' },
-                    { id: 'beat-fade', name: 'Beat Fade', type: 'emphasis', duration: '1s' },
-                    { id: 'scale-pulse', name: 'Scale Pulse', type: 'emphasis', duration: '0.8s' },
-                    { id: 'glow', name: 'Glow', type: 'emphasis', duration: '0.5s' },
-                    
-                    // Emphasis הנפשות - Shake (10)
-                    { id: 'shake', name: 'Shake', type: 'emphasis', duration: '0.8s' },
-                    { id: 'shake-horizontal', name: 'Shake Horizontal', type: 'emphasis', duration: '0.8s' },
-                    { id: 'shake-vertical', name: 'Shake Vertical', type: 'emphasis', duration: '0.8s' },
-                    { id: 'shake-lr', name: 'Shake Left-Right', type: 'emphasis', duration: '0.6s' },
-                    { id: 'shake-top', name: 'Shake Top', type: 'emphasis', duration: '0.8s' },
-                    { id: 'shake-bottom', name: 'Shake Bottom', type: 'emphasis', duration: '0.8s' },
-                    { id: 'shake-rotate', name: 'Shake Rotate', type: 'emphasis', duration: '0.6s' },
-                    { id: 'shake-scale', name: 'Shake Scale', type: 'emphasis', duration: '0.6s' },
-                    { id: 'vibrate', name: 'Vibrate', type: 'emphasis', duration: '0.3s' },
-                    { id: 'jello', name: 'Jello', type: 'emphasis', duration: '0.9s' },
-                    
-                    // Emphasis הנפשות - Wobble (10)
-                    { id: 'wobble', name: 'Wobble', type: 'emphasis', duration: '1s' },
-                    { id: 'wobble-hor-bottom', name: 'Wobble Horizontal Bottom', type: 'emphasis', duration: '0.8s' },
-                    { id: 'wobble-hor-top', name: 'Wobble Horizontal Top', type: 'emphasis', duration: '0.8s' },
-                    { id: 'wobble-ver-left', name: 'Wobble Vertical Left', type: 'emphasis', duration: '0.8s' },
-                    { id: 'wobble-ver-right', name: 'Wobble Vertical Right', type: 'emphasis', duration: '0.8s' },
-                    { id: 'wobble-to-bottom-right', name: 'Wobble To Bottom Right', type: 'emphasis', duration: '0.8s' },
-                    { id: 'wobble-to-top-right', name: 'Wobble To Top Right', type: 'emphasis', duration: '0.8s' },
-                    { id: 'wobble-skew', name: 'Wobble Skew', type: 'emphasis', duration: '1s' },
-                    { id: 'wobble-3d', name: 'Wobble 3D', type: 'emphasis', duration: '1.2s' },
-                    { id: 'rubber-band', name: 'Rubber Band', type: 'emphasis', duration: '1s' },
-                    
-                    // Emphasis הנפשות - Blink (5)
-                    { id: 'blink', name: 'Blink', type: 'emphasis', duration: '0.9s' },
-                    { id: 'blink-1', name: 'Blink 1', type: 'emphasis', duration: '0.5s' },
-                    { id: 'blink-2', name: 'Blink 2', type: 'emphasis', duration: '0.9s' },
-                    { id: 'flash', name: 'Flash', type: 'emphasis', duration: '0.5s' },
-                    { id: 'flicker', name: 'Flicker', type: 'emphasis', duration: '2s' },
-                    
-                    // Emphasis הנפשות - Special (15)
-                    { id: 'bounce', name: 'Bounce', type: 'emphasis', duration: '1s' },
-                    { id: 'swing', name: 'Swing', type: 'emphasis', duration: '1s' },
-                    { id: 'tada', name: 'Tada', type: 'emphasis', duration: '1s' },
-                    { id: 'flip', name: 'Flip', type: 'emphasis', duration: '1s' },
-                    { id: 'flip-2-hor-top', name: 'Flip 2 Horizontal Top', type: 'emphasis', duration: '0.6s' },
-                    { id: 'flip-2-hor-bottom', name: 'Flip 2 Horizontal Bottom', type: 'emphasis', duration: '0.6s' },
-                    { id: 'flip-2-ver-left', name: 'Flip 2 Vertical Left', type: 'emphasis', duration: '0.5s' },
-                    { id: 'flip-2-ver-right', name: 'Flip 2 Vertical Right', type: 'emphasis', duration: '0.5s' },
-                    { id: 'rotate-90-cw', name: 'Rotate 90° CW', type: 'emphasis', duration: '0.4s' },
-                    { id: 'rotate-90-ccw', name: 'Rotate 90° CCW', type: 'emphasis', duration: '0.4s' },
-                    { id: 'rotate-180-cw', name: 'Rotate 180° CW', type: 'emphasis', duration: '0.5s' },
-                    { id: 'rotate-180-ccw', name: 'Rotate 180° CCW', type: 'emphasis', duration: '0.5s' },
-                    { id: 'tilt', name: 'Tilt', type: 'emphasis', duration: '0.6s' },
-                    { id: 'seesaw', name: 'Seesaw', type: 'emphasis', duration: '2s' },
-                    { id: 'float', name: 'Float', type: 'emphasis', duration: '3s' }
-                ];
-
+                
                 this.animations = [
                     // Entrance הנפשות - Fade (10)
                     { id: 'fade-in', name: 'Fade In', type: 'entrance', duration: '0.5s' },
@@ -1717,7 +1665,14 @@
 
                     if (!response.ok) {
                         const errorData = await response.json();
-                        throw new Error(errorData.error?.message || 'שגיאה בקריאה ל-API');
+                        const errorMessage = errorData.error?.message || 'שגיאה בקריאה ל-API';
+                        
+                        // טיפול מיוחד בשגיאת מכסה
+                        if (response.status === 429) {
+                            throw new Error('חרגת ממכסת השימוש היומית ב-API של Gemini. אנא המתן מספר דקות ונסה שוב, או שדרג את תוכנית ה-API שלך בכתובת: https://ai.google.dev');
+                        }
+                        
+                        throw new Error(errorMessage);
                     }
 
                     const data = await response.json();
@@ -1848,7 +1803,10 @@
                     app.ui.showToast('המצגת נוצרה בהצלחה!', 'success');
                 } catch (error) {
                     app.ui.showLoading(false);
-                    app.ui.showToast('שגיאה ביצירת המצגת: ' + error.message, 'error');
+                    const errorMsg = error.message.includes('חרגת ממכסת') 
+                        ? error.message 
+                        : `שגיאה ביצירת המצגת: ${error.message}`;
+                    app.ui.showToast(errorMsg, 'error');
                 }
             }
 
@@ -1971,7 +1929,6 @@ ${currentSlides}
             }
 
             async generateFullPresentation(userPrompt) {
-                console.log('[v0] Starting presentation generation...');
                 
                 const systemInstructions = `אתה מעצב מצגות מקצועי עם יכולות עיצוב מתקדמות.
 
@@ -2039,24 +1996,18 @@ ${currentSlides}
 5. תיאורי תמונות צריכים להיות ללא טקסט - רק תיאור ויזואלי: "no text, no words, clean professional visual of [subject]"
 6. החזר ONLY JSON, ללא טקסט נוסף`;
 
-                try {
-                    console.log('[v0] Calling Gemini API...');
+                
                     const response = await this.callGemini('', systemInstructions);
-                    console.log('[v0] Received response from Gemini');
-                    
-                    // חילוץ JSON מהתגובה
                     const jsonMatch = response.match(/\{[\s\S]*\}/);
                     if (!jsonMatch) {
                         throw new Error('לא התקבלה תגובה תקינה מה-AI');
                     }
                     
-                    console.log('[v0] Parsing JSON...');
                     const presentationData = JSON.parse(jsonMatch[0]);
                     
                     // ניקוי שקפים קיימים
                     app.slides.slides = [];
                     
-                    console.log('[v0] Creating slides...');
                     // יצירת השקפים
                     let imageCount = 0;
                     
@@ -2074,13 +2025,12 @@ ${currentSlides}
                         if (slideData.imagePrompt) {
                             try {
                                 imageCount++;
-                                console.log(`[v0] Generating image ${imageCount}...`);
+                                
                                 const imageUrl = await this.generateImage(slideData.imagePrompt);
                                 slide.image = imageUrl;
-                                console.log(`[v0] Image ${imageCount} generated successfully`);
+                                
                             } catch (error) {
-                                console.error(`[v0] Error generating image: ${error.message}`);
-                                console.log('[v0] Continuing without image...');
+                                console.error(`שגיאה ביצירת תמונה: ${error.message}`);
                                 // אם יש שגיאה, פשוט ממשיכים בלי תמונה
                             }
                         }
@@ -2088,7 +2038,6 @@ ${currentSlides}
                         app.slides.slides.push(slide);
                     }
                     
-                    console.log('[v0] Rendering slides...');
                     app.slides.renderSlides();
                     
                     app.settings.savePresentationToHistory({
@@ -2097,17 +2046,11 @@ ${currentSlides}
                         createdAt: new Date()
                     });
                     
-                    console.log('[v0] Presentation generation complete!');
-                    
-                } catch (error) {
-                    console.error('[v0] Error generating presentation:', error);
-                    throw error;
-                }
+                
             }
             
             async generateImage(prompt) {
                 try {
-                    console.log('[v0] Generating image with Gemini Imagen:', prompt);
                     
                     // שימוש ב-Gemini Imagen API
                     const imageEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict';
@@ -2131,7 +2074,7 @@ ${currentSlides}
                     });
 
                     if (!response.ok) {
-                        console.error('[v0] Imagen API error:', response.status);
+                        console.error('Imagen API error:', response.status);
                         throw new Error('Failed to generate image with Imagen');
                     }
 
@@ -2140,11 +2083,11 @@ ${currentSlides}
                     
                     // המרה ל-data URL
                     const imageUrl = `data:image/png;base64,${imageBase64}`;
-                    console.log('[v0] Image generated successfully');
+                    
                     
                     return imageUrl;
                 } catch (error) {
-                    console.error('[v0] Error generating image:', error);
+                    console.error('Error generating image:', error);
                     // במקרה של שגיאה, נחזיר null
                     return null;
                 }
