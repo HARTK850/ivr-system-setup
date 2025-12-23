@@ -17,7 +17,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&family=Assistant:wght@200;300;400;500;600;700;800&family=Heebo:wght@100;200;300;400;500;600;700;800;900&family=Alef:wght@400;700&family=David+Libre:wght@400;500;700&family=Secular+One&family=Varela+Round&family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&family=Gverets&family=Frank+Ruhl+Libre:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&family=Assistant:wght@200;300;400;500;600;700&family=Heebo:wght@100;200;300;400;500;600;700;800;900&family=Alef:wght@400;700&family=David+Libre:wght@400;500;700&family=Secular+One&family=Varela+Round&family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&family=Gverets&family=Frank+Ruhl+Libre:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -204,8 +204,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             z-index: 10000;
             animation: slideIn 0.3s ease-out;
-            max-width: 400px;
-            min-width: 250px;
+            max-width: 300px;
+            min-width: 200px;
         }
 
         .toast.success {
@@ -580,7 +580,7 @@
                             <button onclick="app.ui.showAIRefinementModal()" 
                                     class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition flex items-center gap-2">
                                 <i class="fas fa-wand-magic-sparkles"></i>
-                                <span>צור מצגת</span>
+                                <span>שפר מצגת</span>
                             </button>
                             
                             <button onclick="app.ui.showTemplateGallery()" 
@@ -936,7 +936,11 @@
                     'Secular One', 'Varela Round', 'Noto Sans Hebrew',
                     'Amatic SC', 'Frank Ruhl Libre', 'Gverets',
                     'Arial', 'Georgia', 'Courier New', 'Trebuchet MS',
-                    'Verdana', 'Times New Roman', 'Comic Sans MS', 'Impact', 'Tahoma'
+                    'Verdana', 'Times New Roman', 'Comic Sans MS', 'Impact', 'Tahoma',
+                    // הוספת גופנים נוספים
+                    'Open Sans', 'Roboto', 'Lato', 'Montserrat', 'Oswald',
+                    'Source Sans Pro', 'Raleway', 'PT Sans', 'Merriweather',
+                    'Ubuntu', 'Playfair Display', 'Poppins', 'Nunito', 'Cabin'
                 ];
                 
                 this.colorSchemes = [
@@ -964,7 +968,18 @@
                     { name: 'Cool', colors: ['#1e40af', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'] },
                     { name: 'Monochrome', colors: ['#000000', '#404040', '#808080', '#c0c0c0', '#ffffff'] },
                     { name: 'Pastel', colors: ['#fef3c7', '#fde68a', '#fcd34d', '#fbbf24', '#f59e0b'] },
-                    { name: 'Vibrant', colors: ['#dc2626', '#ea580c', '#f59e0b', '#84cc16', '#10b981'] }
+                    { name: 'Vibrant', colors: ['#dc2626', '#ea580c', '#f59e0b', '#84cc16', '#10b981'] },
+                    // הוספת ערכות צבעים נוספות
+                    { name: 'Midnight', colors: ['#0f172a', '#1e293b', '#334155', '#475569', '#64748b'] },
+                    { name: 'Peach', colors: ['#fed7aa', '#fdba74', '#fb923c', '#f97316', '#ea580c'] },
+                    { name: 'Lavender', colors: ['#f3e8ff', '#e9d5ff', '#d8b4fe', '#c084fc', '#a855f7'] },
+                    { name: 'Mint', colors: ['#d1fae5', '#a7f3d0', '#6ee7b7', '#34d399', '#10b981'] },
+                    { name: 'Coral', colors: ['#fecaca', '#fca5a5', '#f87171', '#ef4444', '#dc2626'] },
+                    { name: 'Sky', colors: ['#e0f2fe', '#bae6fd', '#7dd3fc', '#38bdf8', '#0ea5e9'] },
+                    { name: 'Grape', colors: ['#ede9fe', '#ddd6fe', '#c4b5fd', '#a78bfa', '#8b5cf6'] },
+                    { name: 'Lemon', colors: ['#fef9c3', '#fef08a', '#fde047', '#facc15', '#eab308'] },
+                    { name: 'Salmon', colors: ['#ffe4e6', '#fecdd3', '#fda4af', '#fb7185', '#f43f5e'] },
+                    { name: 'Turquoise', colors: ['#ccfbf1', '#99f6e4', '#5eead4', '#2dd4bf', '#14b8a6'] }
                 ];
                 
                 this.backgroundPatterns = [
@@ -982,7 +997,13 @@
                     { id: 'stripes-h', style: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.05) 50%)', size: '20px 20px' },
                     { id: 'checkerboard', style: 'linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%), linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%)', size: '20px 20px', position: '0 0, 10px 10px' },
                     { id: 'polka', style: 'radial-gradient(circle, rgba(0,0,0,0.08) 25%, transparent 26%)', size: '30px 30px' },
-                    { id: 'moroccan', style: 'radial-gradient(circle at 100% 150%, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 28%, transparent 29%, transparent 36%, rgba(0,0,0,0.05) 36%, rgba(0,0,0,0.05) 40%, transparent 40%, transparent), radial-gradient(circle at 0 150%, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 28%, transparent 29%, transparent 36%, rgba(0,0,0,0.05) 36%, rgba(0,0,0,0.05) 40%, transparent 40%, transparent)', size: '60px 60px' }
+                    { id: 'moroccan', style: 'radial-gradient(circle at 100% 150%, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 28%, transparent 29%, transparent 36%, rgba(0,0,0,0.05) 36%, rgba(0,0,0,0.05) 40%, transparent 40%, transparent), radial-gradient(circle at 0 150%, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 28%, transparent 29%, transparent 36%, rgba(0,0,0,0.05) 36%, rgba(0,0,0,0.05) 40%, transparent 40%, transparent)', size: '60px 60px' },
+                    // הוספת דפוסים נוספים
+                    { id: 'bubbles', style: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 5%, transparent 5%), radial-gradient(circle at 60% 70%, rgba(255,255,255,0.1) 8%, transparent 8%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 6%, transparent 6%)', size: '100px 100px' },
+                    { id: 'carbon', style: 'linear-gradient(27deg, rgba(0,0,0,0.05) 5%, transparent 5%), linear-gradient(207deg, rgba(0,0,0,0.05) 5%, transparent 5%), linear-gradient(127deg, transparent 5%, rgba(0,0,0,0.05) 5%)', size: '10px 10px' },
+                    { id: 'blueprint', style: 'linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', size: '100px 100px, 100px 100px, 20px 20px, 20px 20px', position: '-2px -2px, -2px -2px, -1px -1px, -1px -1px' },
+                    { id: 'honeycomb', style: 'radial-gradient(circle farthest-side at 0% 50%, rgba(0,0,0,0) 23.5%, rgba(0,0,0,0.05) 0), radial-gradient(circle farthest-side at 0% 50%, rgba(0,0,0,0.05) 24%, rgba(0,0,0,0) 0)', size: '20px 20px' },
+                    { id: 'stars', style: 'radial-gradient(2px 2px at 20px 30px, white, transparent), radial-gradient(2px 2px at 60px 70px, white, transparent), radial-gradient(1px 1px at 50px 50px, white, transparent)', size: '80px 80px' }
                 ];
                 
                 this.textStyles = [
@@ -995,7 +1016,12 @@
                     { id: 'glow', weight: 'bold', transform: 'none', decoration: 'none', textShadow: '0 0 10px currentColor' },
                     { id: '3d', weight: 'bold', transform: 'none', decoration: 'none', textShadow: '1px 1px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.2)' },
                     { id: 'neon', weight: 'bold', transform: 'none', decoration: 'none', textShadow: '0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor' },
-                    { id: 'retro', weight: '900', transform: 'uppercase', decoration: 'none', letterSpacing: '0.2em' }
+                    { id: 'retro', weight: '900', transform: 'uppercase', decoration: 'none', letterSpacing: '0.2em' },
+                    // הוספת סגנונות טקסט נוספים
+                    { id: 'gradient-text', weight: 'bold', transform: 'none', decoration: 'none', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                    { id: 'embossed', weight: 'bold', transform: 'none', decoration: 'none', textShadow: '-1px -1px 0 rgba(255,255,255,0.3), 1px 1px 0 rgba(0,0,0,0.8)' },
+                    { id: 'double-shadow', weight: 'bold', transform: 'none', decoration: 'none', textShadow: '3px 3px 0 rgba(0,0,0,0.2), 6px 6px 0 rgba(0,0,0,0.1)' },
+                    { id: 'stroke', weight: 'bold', transform: 'none', decoration: 'none', webkitTextStroke: '1px rgba(0,0,0,0.5)' }
                 ];
                 
                 this.borderStyles = [
@@ -1008,7 +1034,11 @@
                     { id: 'ridge', width: '4px', style: 'ridge', radius: '8px' },
                     { id: 'thick', width: '5px', style: 'solid', radius: '12px' },
                     { id: 'rounded', width: '2px', style: 'solid', radius: '20px' },
-                    { id: 'pill', width: '2px', style: 'solid', radius: '9999px' }
+                    { id: 'pill', width: '2px', style: 'solid', radius: '9999px' },
+                    // הוספת סגנונות מסגרת נוספים
+                    { id: 'inset', width: '2px', style: 'inset', radius: '8px' },
+                    { id: 'outset', width: '2px', style: 'outset', radius: '8px' },
+                    { id: 'gradient-border', width: '3px', style: 'solid', radius: '12px', gradient: true }
                 ];
                 
                 this.shadowStyles = [
@@ -1021,7 +1051,12 @@
                     { id: 'inner', shadow: 'inset 0 2px 4px rgba(0,0,0,0.06)' },
                     { id: 'glow', shadow: '0 0 20px rgba(255,255,255,0.5)' },
                     { id: 'colored', shadow: '0 10px 30px rgba(139, 92, 246, 0.3)' },
-                    { id: 'multi', shadow: '0 4px 6px rgba(0,0,0,0.1), 0 10px 15px rgba(0,0,0,0.1)' }
+                    { id: 'multi', shadow: '0 4px 6px rgba(0,0,0,0.1), 0 10px 15px rgba(0,0,0,0.1)' },
+                    // הוספת סגנונות צל נוספים
+                    { id: 'soft', shadow: '0 2px 15px rgba(0,0,0,0.08)' },
+                    { id: 'hard', shadow: '10px 10px 0 rgba(0,0,0,0.2)' },
+                    { id: 'neon-glow', shadow: '0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(139, 92, 246, 0.4)' },
+                    { id: 'elevated', shadow: '0 10px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)' }
                 ];
                 
                 this.cornerStyles = [
@@ -1032,7 +1067,11 @@
                     { id: 'xl', radius: '16px' },
                     { id: '2xl', radius: '24px' },
                     { id: 'full', radius: '9999px' },
-                    { id: 'custom-tl', radiusTopLeft: '20px', radiusOther: '4px' }
+                    { id: 'custom-tl', radiusTopLeft: '20px', radiusOther: '4px' },
+                    // הוספת סגנונות פינה נוספים
+                    { id: 'asymmetric', radiusTopLeft: '20px', radiusTopRight: '5px', radiusBottomRight: '20px', radiusBottomLeft: '5px' },
+                    { id: 'top-round', radiusTopLeft: '20px', radiusTopRight: '20px', radiusBottomRight: '0', radiusBottomLeft: '0' },
+                    { id: 'bottom-round', radiusTopLeft: '0', radiusTopRight: '0', radiusBottomRight: '20px', radiusBottomLeft: '20px' }
                 ];
                 
                 this.layouts = [
@@ -1043,7 +1082,12 @@
                     { id: 'hero', name: 'Hero' },
                     { id: 'card', name: 'Card' },
                     { id: 'timeline', name: 'Timeline' },
-                    { id: 'comparison', name: 'Comparison' }
+                    { id: 'comparison', name: 'Comparison' },
+                    // הוספת פריסות נוספות
+                    { id: 'magazine', name: 'Magazine' },
+                    { id: 'overlap', name: 'Overlap' },
+                    { id: 'fullscreen', name: 'Fullscreen' },
+                    { id: 'asymmetric', name: 'Asymmetric' }
                 ];
                 
                 this.animations = [
@@ -1056,7 +1100,12 @@
                     { id: 'zoom', name: 'Zoom In' },
                     { id: 'rotate', name: 'Rotate' },
                     { id: 'bounce', name: 'Bounce' },
-                    { id: 'flip', name: 'Flip' }
+                    { id: 'flip', name: 'Flip' },
+                    // הוספת אנימציות נוספות
+                    { id: 'swing', name: 'Swing' },
+                    { id: 'shake', name: 'Shake' },
+                    { id: 'pulse', name: 'Pulse' },
+                    { id: 'wobble', name: 'Wobble' }
                 ];
                 
                 this.gradients = [
@@ -1074,7 +1123,48 @@
                     'linear-gradient(135deg, #f77062 0%, #fe5196 100%)',
                     'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)',
                     'linear-gradient(135deg, #e8198b 0%, #c7eafd 100%)',
-                    'linear-gradient(135deg, #96fbc4 0%, #f9f586 100%)'
+                    'linear-gradient(135deg, #96fbc4 0%, #f9f586 100%)',
+                    // הוספת גרדיאנטים נוספים
+                    'linear-gradient(135deg, #667eea 0%, #f093fb 50%, #f5576c 100%)',
+                    'linear-gradient(135deg, #4facfe 0%, #43e97b 50%, #38f9d7 100%)',
+                    'linear-gradient(135deg, #fa709a 0%, #fee140 50%, #30cfd0 100%)',
+                    'radial-gradient(circle, #667eea 0%, #764ba2 100%)',
+                    'radial-gradient(circle, #f093fb 0%, #f5576c 100%)',
+                    'conic-gradient(from 0deg, #667eea, #f093fb, #4facfe, #43e97b, #667eea)'
+                ];
+                
+                this.imageStyles = [
+                    { id: 'normal', filter: 'none', transform: 'none' },
+                    { id: 'grayscale', filter: 'grayscale(100%)' },
+                    { id: 'sepia', filter: 'sepia(80%)' },
+                    { id: 'blur', filter: 'blur(2px)' },
+                    { id: 'brightness', filter: 'brightness(1.2)' },
+                    { id: 'contrast', filter: 'contrast(1.3)' },
+                    { id: 'saturate', filter: 'saturate(1.5)' },
+                    { id: 'hue-rotate', filter: 'hue-rotate(90deg)' },
+                    { id: 'invert', filter: 'invert(100%)' }
+                ];
+                
+                this.textDecorations = [
+                    { id: 'none', decoration: 'none' },
+                    { id: 'underline', decoration: 'underline' },
+                    { id: 'overline', decoration: 'overline' },
+                    { id: 'line-through', decoration: 'line-through' },
+                    { id: 'wavy-underline', decoration: 'underline wavy' }
+                ];
+                
+                this.contentAlignments = [
+                    { id: 'left', align: 'flex-start' },
+                    { id: 'center', align: 'center' },
+                    { id: 'right', align: 'flex-end' },
+                    { id: 'justify', align: 'space-between' }
+                ];
+                
+                this.spacingOptions = [
+                    { id: 'compact', padding: '10px', gap: '10px' },
+                    { id: 'normal', padding: '20px', gap: '15px' },
+                    { id: 'relaxed', padding: '30px', gap: '20px' },
+                    { id: 'loose', padding: '40px', gap: '30px' }
                 ];
             }
             
@@ -1117,6 +1207,22 @@
             getRandomGradient() {
                 return this.gradients[Math.floor(Math.random() * this.gradients.length)];
             }
+
+            getRandomImageStyle() {
+                return this.imageStyles[Math.floor(Math.random() * this.imageStyles.length)];
+            }
+            
+            getRandomTextDecoration() {
+                return this.textDecorations[Math.floor(Math.random() * this.textDecorations.length)];
+            }
+            
+            getRandomContentAlignment() {
+                return this.contentAlignments[Math.floor(Math.random() * this.contentAlignments.length)];
+            }
+            
+            getRandomSpacing() {
+                return this.spacingOptions[Math.floor(Math.random() * this.spacingOptions.length)];
+            }
             
             // פונקציה שמחזירה עיצוב רנדומלי מלא
             getFullRandomDesign() {
@@ -1126,6 +1232,9 @@
                 const border = this.getRandomBorderStyle();
                 const shadow = this.getRandomShadowStyle();
                 const corner = this.getRandomCornerStyle();
+                const layout = this.getRandomLayout();
+                const animation = this.getRandomAnimation();
+                const gradient = this.getRandomGradient();
                 
                 return {
                     font: this.getRandomFont(),
@@ -1138,9 +1247,9 @@
                     border: border,
                     shadow: shadow,
                     corner: corner,
-                    layout: this.getRandomLayout(),
-                    animation: this.getRandomAnimation(),
-                    gradient: this.getRandomGradient()
+                    layout: layout,
+                    animation: animation,
+                    gradient: gradient
                 };
             }
         }
@@ -1446,23 +1555,35 @@ ${currentSlides}
                 const systemInstructions = `אתה מעצב מצגות מקצועי עם יכולות עיצוב מתקדמות.
 
 אפשרויות העיצוב שלך כוללות:
-**גופנים**: Rubik, Assistant, Heebo, Alef, David Libre, Secular One, Varela Round, Noto Sans Hebrew, Amatic SC, Frank Ruhl Libre, Gverets, Arial, Georgia, Courier New, Trebuchet MS, Verdana, Times New Roman, Comic Sans MS, Impact, Tahoma
+**גופנים** (34 אפשרויות): Rubik, Assistant, Heebo, Alef, David Libre, Secular One, Varela Round, Noto Sans Hebrew, Amatic SC, Frank Ruhl Libre, Gverets, Arial, Georgia, Courier New, Trebuchet MS, Verdana, Times New Roman, Comic Sans MS, Impact, Tahoma, Open Sans, Roboto, Lato, Montserrat, Oswald, Source Sans Pro, Raleway, PT Sans, Merriweather, Ubuntu, Playfair Display, Poppins, Nunito, Cabin
 
-**ערכות צבעים**: Ocean, Sunset, Forest, Royal, Cherry, Ocean Blue, Emerald, Amber, Purple, Pink, Teal, Indigo, Rose, Cyan, Lime, Fuchsia, Slate, Stone, Zinc, Neutral, Warm, Cool, Monochrome, Pastel, Vibrant
+**ערכות צבעים** (35 אפשרויות): Ocean, Sunset, Forest, Royal, Cherry, Ocean Blue, Emerald, Amber, Purple, Pink, Teal, Indigo, Rose, Cyan, Lime, Fuchsia, Slate, Stone, Zinc, Neutral, Warm, Cool, Monochrome, Pastel, Vibrant, Midnight, Peach, Lavender, Mint, Coral, Sky, Grape, Lemon, Salmon, Turquoise
 
-**תבניות רקע**: dots (נקודות), grid (רשת), diagonal (אלכסוני), waves (גלים), zigzag, cross (צלב), hexagon (משושה), triangles (משולשים), circles (עיגולים), stripes-v (פסים אנכיים), stripes-h (פסים אופקיים), checkerboard (לוח שח), polka (נקודות גדולות), moroccan (מרוקאי)
+**תבניות רקע** (20 אפשרויות): none, dots, grid, diagonal, waves, zigzag, cross, hexagon, triangles, circles, stripes-v, stripes-h, checkerboard, polka, moroccan, bubbles, carbon, blueprint, honeycomb, stars
 
-**סגנונות טקסט**: bold (מודגש), italic (נטוי), uppercase (אותיות גדולות), underline (קו תחתון), shadow (צל), outline (מתאר), glow (זוהר), 3d (תלת מימד), neon (ניאון), retro (רטרו)
+**סגנונות טקסט** (14 אפשרויות): bold, italic, uppercase, underline, shadow, outline, glow, 3d, neon, retro, gradient-text, embossed, double-shadow, stroke
 
-**מסגרות**: none, solid, dashed, dotted, double, groove, ridge, thick, rounded, pill
+**מסגרות** (13 אפשרויות): none, solid, dashed, dotted, double, groove, ridge, thick, rounded, pill, inset, outset, gradient-border
 
-**צללים**: none, sm, md, lg, xl, 2xl, inner, glow, colored, multi
+**צללים** (14 אפשרויות): none, sm, md, lg, xl, 2xl, inner, glow, colored, multi, soft, hard, neon-glow, elevated
 
-**פינות**: sharp (חדות), sm, md, lg, xl, 2xl, full (עגולות לחלוטין)
+**פינות** (11 אפשרויות): sharp, sm, md, lg, xl, 2xl, full, custom-tl, asymmetric, top-round, bottom-round
 
-**פריסות**: standard, centered, split, sidebar, hero, card, timeline, comparison
+**פריסות** (12 אפשרויות): standard, centered, split, sidebar, hero, card, timeline, comparison, magazine, overlap, fullscreen, asymmetric
 
-**אנימציות**: none, fade, slide-up, slide-down, slide-left, slide-right, zoom, rotate, bounce, flip
+**אנימציות** (14 אפשרויות): none, fade, slide-up, slide-down, slide-left, slide-right, zoom, rotate, bounce, flip, swing, shake, pulse, wobble
+
+**גרדיאנטים** (21 אפשרויות): מגוון רחב של גרדיאנטים ליניאריים, רדיאליים וקוניים
+
+**פילטרי תמונה** (9 אפשרויות): normal, grayscale, sepia, blur, brightness, contrast, saturate, hue-rotate, invert
+
+**קישוטי טקסט** (5 אפשרויות): none, underline, overline, line-through, wavy-underline
+
+**יישור תוכן** (4 אפשרויות): left, center, right, justify
+
+**ריווח** (4 אפשרויות): compact, normal, relaxed, loose
+
+**סה"כ: 300+ אפשרויות עיצוב!**
 
 בקשת המשתמש: ${userPrompt}
 
@@ -1484,7 +1605,7 @@ ${currentSlides}
         "shadow": "md",
         "corner": "lg"
       },
-      "imagePrompt": "תיאור מדויק לתמונה ללא טקסט"
+      "imagePrompt": "תיאור מדויק לתמונה ללא טקסט (אופציונלי - השתמש בזה רק כשהתמונה תוסיף ערך אמיתי)"
     }
   ]
 }
@@ -1492,9 +1613,9 @@ ${currentSlides}
 חשוב:
 1. צור לפחות 5-8 שקפים
 2. השתמש בעיצוב מגוון ויצירתי - כל שקף יכול להיות שונה!
-3. אל תכלול יותר מ-2-3 תמונות בסך הכל (כדי לא להגיע למגבלת API)
+3. תמונות - השתמש בהן בחוכמה! הוסף תמונה רק כשהיא תורמת לתוכן. אל תוסיף יותר מדי תמונות כדי לא להגיע למגבלת API
 4. תמונות צריכות להיות רלוונטיות לתוכן השקף
-5. תיאורי תמונות צריכים להיות ללא טקסט - רק תיאור ויזואלי
+5. תיאורי תמונות צריכים להיות ללא טקסט - רק תיאור ויזואלי: "no text, no words, clean professional visual of [subject]"
 6. החזר ONLY JSON, ללא טקסט נוסף`;
 
                 try {
@@ -1517,7 +1638,6 @@ ${currentSlides}
                     console.log('[v0] Creating slides...');
                     // יצירת השקפים
                     let imageCount = 0;
-                    const maxImages = 2; // מגבלה מופחתת ל-2 תמונות
                     
                     for (const slideData of presentationData.slides) {
                         const slide = app.slides.createSlide(slideData.layout || 'standard');
@@ -1529,12 +1649,13 @@ ${currentSlides}
                             slide.style = { ...slide.style, ...slideData.style };
                         }
                         
-                        if (slideData.imagePrompt && imageCount < maxImages) {
+                        // יצירת תמונה אם יש תיאור
+                        if (slideData.imagePrompt) {
                             try {
-                                console.log(`[v0] Generating image ${imageCount + 1}/${maxImages}...`);
+                                imageCount++;
+                                console.log(`[v0] Generating image ${imageCount}...`);
                                 const imageUrl = await this.generateImage(slideData.imagePrompt);
                                 slide.image = imageUrl;
-                                imageCount++;
                                 console.log(`[v0] Image ${imageCount} generated successfully`);
                             } catch (error) {
                                 console.error(`[v0] Error generating image: ${error.message}`);
@@ -1565,7 +1686,7 @@ ${currentSlides}
             
             async generateImage(prompt) {
                 try {
-                    const cleanPrompt = encodeURIComponent(prompt + ', no text, no words, no letters, clean visual');
+                    const cleanPrompt = encodeURIComponent(prompt + ', no text, no words, clean professional visual');
                     const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1200&height=800&nologo=true&enhance=true&model=flux&seed=${Date.now()}`;
                     
                     return new Promise((resolve, reject) => {
@@ -1727,7 +1848,13 @@ ${currentSlides}
                     return;
                 }
                 
-                app.slides.slides = presentation.slides;
+                // טעינת השקפים
+                app.slides.slides = JSON.parse(JSON.stringify(presentation.slides)); // העתקה עמוקה
+                
+                // הסתרת מסך התחלה והצגת השקפים
+                document.getElementById('welcomeScreen').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'flex';
+                
                 app.slides.renderSlides();
                 app.ui.closePresentationsHistory();
                 app.ui.showToast('המצגת נטענה בהצלחה!', 'success');
@@ -1777,14 +1904,15 @@ ${currentSlides}
                     right: 20px;
                     background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
                     color: white;
-                    padding: 16px 24px;
+                    padding: 12px 20px;
                     border-radius: 12px;
                     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                     z-index: 10000;
                     font-weight: 600;
                     animation: slideIn 0.3s ease-out;
-                    max-width: 400px;
-                    min-width: 250px;
+                    max-width: 300px;
+                    min-width: 200px;
+                    font-size: 14px;
                 `;
                 toast.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -2057,9 +2185,68 @@ ${currentSlides}
                     for (const slide of app.slides.slides) {
                         const pptxSlide = pptx.addSlide();
                         
-                        // רקע
-                        if (slide.style && slide.style.backgroundColor) {
-                            pptxSlide.background = { color: slide.style.backgroundColor.replace('#', '') };
+                        if (slide.style) {
+                            try {
+                                // יצירת canvas עם הרקע של השקף
+                                const canvas = document.createElement('canvas');
+                                canvas.width = 1920;
+                                canvas.height = 1080;
+                                const ctx = canvas.getContext('2d');
+                                
+                                // ציור הרקע
+                                if (slide.style.backgroundColor) {
+                                    ctx.fillStyle = slide.style.backgroundColor;
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                }
+                                
+                                // הוספת דפוס רקע אם קיים
+                                if (slide.style.pattern && slide.style.pattern !== 'none') {
+                                    const pattern = app.templates.advancedDesign.backgroundPatterns.find(p => p.id === slide.style.pattern);
+                                    if (pattern && pattern.style !== 'none') {
+                                        // יצירת canvas זמני לדפוס
+                                        const patternCanvas = document.createElement('canvas');
+                                        patternCanvas.width = 100;
+                                        patternCanvas.height = 100;
+                                        const patternCtx = patternCanvas.getContext('2d');
+                                        
+                                        // ציור הדפוס (פשוט - נקודות כדוגמה)
+                                        if (slide.style.pattern === 'dots') {
+                                            patternCtx.fillStyle = 'rgba(0,0,0,0.1)';
+                                            for (let i = 0; i < 100; i += 20) {
+                                                for (let j = 0; j < 100; j += 20) {
+                                                    patternCtx.beginPath();
+                                                    patternCtx.arc(i, j, 1, 0, Math.PI * 2);
+                                                    patternCtx.fill();
+                                                }
+                                            }
+                                        } else if (slide.style.pattern === 'diagonal') {
+                                            patternCtx.strokeStyle = 'rgba(0,0,0,0.05)';
+                                            patternCtx.lineWidth = 10;
+                                            for (let i = -100; i < 200; i += 20) {
+                                                patternCtx.beginPath();
+                                                patternCtx.moveTo(i, 0);
+                                                patternCtx.lineTo(i + 100, 100);
+                                                patternCtx.stroke();
+                                            }
+                                        }
+                                        
+                                        // שכפול הדפוס על כל הרקע
+                                        const pat = ctx.createPattern(patternCanvas, 'repeat');
+                                        ctx.fillStyle = pat;
+                                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    }
+                                }
+                                
+                                // המרה ל-base64 והוספה כרקע ב-PPTX
+                                const backgroundImage = canvas.toDataURL('image/png');
+                                pptxSlide.background = { data: backgroundImage };
+                            } catch (error) {
+                                console.error('שגיאה ביצירת רקע:', error);
+                                // אם יש בעיה, פשוט שים צבע רקע רגיל
+                                if (slide.style.backgroundColor) {
+                                    pptxSlide.background = { color: slide.style.backgroundColor.replace('#', '') };
+                                }
+                            }
                         }
                         
                         // כותרת
@@ -2074,7 +2261,7 @@ ${currentSlides}
                                 bold: true,
                                 color: slide.style?.textColor?.replace('#', '') || 'FFFFFF',
                                 align: 'right',
-                                fontFace: 'Arial',
+                                fontFace: slide.style?.font || 'Arial',
                                 rtlMode: true
                             });
                         }
@@ -2096,7 +2283,7 @@ ${currentSlides}
                                 color: slide.style?.textColor?.replace('#', '') || 'FFFFFF',
                                 align: 'right',
                                 valign: 'top',
-                                fontFace: 'Arial',
+                                fontFace: slide.style?.font || 'Arial',
                                 rtlMode: true
                             });
                         }
@@ -2123,7 +2310,7 @@ ${currentSlides}
                 } catch (error) {
                     console.error('Error exporting to PPTX:', error);
                     app.ui.showLoading(false);
-                    app.ui.showToast('שגיאה בייצוא: ' + error.message, 'error');
+                    app.ui.showToast('שגיאה בייצוא המצגת', 'error');
                 }
             }
             
