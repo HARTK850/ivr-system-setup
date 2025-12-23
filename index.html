@@ -1999,52 +1999,31 @@ ${currentSlides}
             }
 
             async generateImage(description) {
-                // המרת תיאור לקטגוריה עבור חיפוש תמונות
-                const categories = {
-                    'טכנולוגיה': 'technology,computer,digital',
-                    'technology': 'technology,computer,digital',
-                    'עסקים': 'business,office,professional',
-                    'business': 'business,office,professional',
-                    'חינוך': 'education,school,learning',
-                    'education': 'education,school,learning',
-                    'בריאות': 'health,medical,wellness',
-                    'health': 'health,medical,wellness',
-                    'טבע': 'nature,landscape,outdoor',
-                    'nature': 'nature,landscape,outdoor',
-                    'אמנות': 'art,creative,design',
-                    'art': 'art,creative,design',
-                    'מדע': 'science,research,laboratory',
-                    'science': 'science,research,laboratory',
-                    'ספורט': 'sports,fitness,athletic',
-                    'sports': 'sports,fitness,athletic',
-                    'מוסיקה': 'music,musical,instrument',
-                    'music': 'music,musical,instrument',
-                    'אוכל': 'food,cuisine,meal',
-                    'food': 'food,cuisine,meal',
-                    'מחשבים': 'computer,laptop,technology',
-                    'AI': 'artificial-intelligence,technology,future',
-                    'בינה מלאכותית': 'artificial-intelligence,technology,future'
-                };
-
-                let query = 'abstract,modern';
-                const lowerDesc = description.toLowerCase();
-                
-                for (const [keyword, categoryQuery] of Object.entries(categories)) {
-                    if (lowerDesc.includes(keyword.toLowerCase())) {
-                        query = categoryQuery;
-                        break;
-                    }
+                try {
+                    // שימוש ב-Unsplash API לתמונות אמיתיות (לא דורש API key למספר מוגבל של בקשות)
+                    const searchQuery = encodeURIComponent(description.substring(0, 50));
+                    const unsplashUrl = `https://source.unsplash.com/1200x800/?${searchQuery}`;
+                    
+                    // בודק אם התמונה נטענת
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => resolve(unsplashUrl);
+                        img.onerror = () => {
+                            console.log('[v0] Unsplash image failed, using gradient fallback');
+                            resolve(this.generateGradientFallback(description));
+                        };
+                        img.src = unsplashUrl;
+                        
+                        // timeout של 5 שניות
+                        setTimeout(() => {
+                            console.log('[v0] Unsplash timeout, using gradient fallback');
+                            resolve(this.generateGradientFallback(description));
+                        }, 5000);
+                    });
+                } catch (error) {
+                    console.error('[v0] Error loading Unsplash image:', error);
+                    return this.generateGradientFallback(description);
                 }
-
-                // שימוש ב-Lorem Picsum עם seed מבוסס על התיאור
-                const seed = Math.abs(description.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0));
-                const width = 1200;
-                const height = 675;
-                
-                // Lorem Picsum - תמונות אמיתיות ללא צורך ב-API key
-                const imageUrl = `https://picsum.photos/seed/${seed}/${width}/${height}`;
-                
-                return imageUrl;
             }
             
             generateGradientFallback(description) {
@@ -2075,33 +2054,12 @@ ${currentSlides}
 
             async generateImageForSlide(slideContent, index) {
                 try {
-                    const description = slideContent.title + ' ' + slideContent.content;
-                    const imageUrl = await this.generateImage(description);
-                    
-                    // בדיקה אם התמונה נטענת בהצלחה עם timeout
-                    return new Promise((resolve) => {
-                        const img = new Image();
-                        const timeout = setTimeout(() => {
-                            console.log('[v0] Image loading timeout, using gradient fallback');
-                            resolve(this.generateGradientFallback(description));
-                        }, 5000);
-                        
-                        img.onload = () => {
-                            clearTimeout(timeout);
-                            resolve(imageUrl);
-                        };
-                        
-                        img.onerror = () => {
-                            clearTimeout(timeout);
-                            console.log('[v0] Image failed to load, using gradient fallback');
-                            resolve(this.generateGradientFallback(description));
-                        };
-                        
-                        img.src = imageUrl;
-                    });
+                    const imageDescription = slideContent.title || slideContent.content || 'abstract background';
+                    const imageUrl = await this.generateImage(imageDescription);
+                    return imageUrl;
                 } catch (error) {
-                    console.error('[v0] Error generating image:', error);
-                    return this.generateGradientFallback(slideContent.title + ' ' + slideContent.content);
+                    console.error('[v0] Error generating image for slide:', error);
+                    return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                 }
             }
 
@@ -3617,8 +3575,5 @@ ${currentSlides}
         });
 
     </script>
-</head>
-<body>
-    <!-- ... rest of the HTML body ... -->
 </body>
 </html>
