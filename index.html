@@ -1,134 +1,86 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-<meta charset="UTF-8">
-<title>יצירת שיר ב-AI</title>
-<style>
-body {
-  font-family: Arial;
-  background: #0f1220;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.box {
-  background: #161a2f;
-  padding: 25px;
-  border-radius: 12px;
-  width: 380px;
-  text-align: center;
-}
-
-textarea {
-  width: 100%;
-  height: 80px;
-  border-radius: 8px;
-  border: none;
-  padding: 10px;
-  resize: none;
-}
-
-button {
-  margin-top: 10px;
-  padding: 10px;
-  width: 100%;
-  border: none;
-  border-radius: 8px;
-  background: #4f7cff;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-#status {
-  margin-top: 10px;
-}
-
-audio {
-  margin-top: 15px;
-  width: 100%;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>יצירת מוזיקה ב-AI</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 15px;
+    }
+    textarea, button {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    audio {
+      margin-top: 20px;
+      width: 300px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="box">
-  <h2>🎶 יצירת שיר עם AI</h2>
-  <textarea id="prompt" placeholder="כתוב כאן איך אתה רוצה שהשיר יישמע..."></textarea>
-  <button onclick="createSong()">צור שיר</button>
+  <h2>🎵 יצירת מוזיקה ב-AI</h2>
+
+  <textarea id="prompt" placeholder="כתוב כאן תיאור למוזיקה..."></textarea>
+  <button onclick="createMusic()">צור מוזיקה</button>
+
   <div id="status"></div>
   <audio id="player" controls></audio>
-</div>
 
 <script>
-const API_KEY = "כאן_המפתח_שלך";
-const CREATE_URL = "כאן_כתובת_יצירה";
-const STATUS_URL = "כאן_כתובת_בדיקת_סטטוס";
+const API_KEY = "כאן_שים_את_המפתח_החדש_שלך";
 
-async function createSong() {
-  const prompt = document.getElementById("prompt").value;
-  const status = document.getElementById("status");
-  status.innerText = "🔄 שולח בקשה ליצירה...";
+async function createMusic() {
+  document.getElementById("status").innerText = "שולח בקשה...";
 
-  const res = await fetch(CREATE_URL, {
+  const res = await fetch("https://api.piapi.ai/api/v1/task", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer " + API_KEY,
+      "x-api-key": API_KEY,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      prompt: prompt,
-      instrumental: false
+      model: "suno",
+      task_type: "generate_music",
+      input: {
+        gpt_description_prompt: document.getElementById("prompt").value,
+        lyrics_type: "instrumental"
+      }
     })
   });
 
   const data = await res.json();
-  const taskId = data.task_id || data.taskId;
+  const taskId = data.data.task_id;
 
-  status.innerText = "⏳ יוצר שיר...";
+  document.getElementById("status").innerText = "נוצרה משימה... ממתין לתוצאה";
 
-  checkStatus(taskId);
+  checkResult(taskId);
 }
 
-async function checkStatus(taskId) {
-  const status = document.getElementById("status");
-
+async function checkResult(taskId) {
   const interval = setInterval(async () => {
-    const res = await fetch(`${STATUS_URL}?task_id=${taskId}`, {
-      headers: {
-        "Authorization": "Bearer " + API_KEY"
-      }
+    const res = await fetch(`https://api.piapi.ai/api/v1/task/${taskId}`, {
+      headers: { "x-api-key": API_KEY }
     });
 
     const data = await res.json();
 
-    if (data.status === "completed") {
+    if (data.data.status === "completed") {
       clearInterval(interval);
-      status.innerText = "✅ השיר מוכן!";
-
-      const audioBlob = base64ToBlob(data.audio_base64, "audio/mpeg");
-      const audioUrl = URL.createObjectURL(audioBlob);
-
+      const audioUrl = data.data.output.audio_url;
       document.getElementById("player").src = audioUrl;
+      document.getElementById("status").innerText = "✅ מוכן!";
     }
-
-    if (data.status === "failed") {
-      clearInterval(interval);
-      status.innerText = "❌ היצירה נכשלה";
-    }
-  }, 5000);
-}
-
-function base64ToBlob(base64, type) {
-  const bytes = atob(base64);
-  let arr = new Uint8Array(bytes.length);
-  for (let i = 0; i < bytes.length; i++) {
-    arr[i] = bytes.charCodeAt(i);
-  }
-  return new Blob([arr], { type });
+  }, 4000);
 }
 </script>
 
