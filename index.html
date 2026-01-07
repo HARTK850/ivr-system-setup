@@ -1,890 +1,136 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI yemot</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+<meta charset="UTF-8">
+<title>יצירת שיר ב-AI</title>
+<style>
+body {
+  font-family: Arial;
+  background: #0f1220;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
 
-        .spinner {
-            border-top-color: #3498db;
-            animation: spin 1s linear infinite;
-        }
+.box {
+  background: #161a2f;
+  padding: 25px;
+  border-radius: 12px;
+  width: 380px;
+  text-align: center;
+}
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        /* סגנון לפאנלים של ה-MFA */
-        .panel {
-            display: none;
-        }
+textarea {
+  width: 100%;
+  height: 80px;
+  border-radius: 8px;
+  border: none;
+  padding: 10px;
+  resize: none;
+}
 
-        /* סגנון לרשימת הפעולות */
-        .action-item {
-            transition: all 0.3s ease;
-        }
-        .action-item:hover {
-            background-color: #f8fafc;
-        }
-    </style>
+button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: #4f7cff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#status {
+  margin-top: 10px;
+}
+
+audio {
+  margin-top: 15px;
+  width: 100%;
+}
+</style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
-    
-    <div class="w-full max-w-2xl bg-white rounded-lg shadow-xl p-8">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">תוכנת AI מתקדמת לעדכון שלוחות במערכות ימות המשיח</h1>
+<body>
+
+<div class="box">
+  <h2>🎶 יצירת שיר עם AI</h2>
+  <textarea id="prompt" placeholder="כתוב כאן איך אתה רוצה שהשיר יישמע..."></textarea>
+  <button onclick="createSong()">צור שיר</button>
+  <div id="status"></div>
+  <audio id="player" controls></audio>
+</div>
+
+<script>
+const API_KEY = "כאן_המפתח_שלך";
+const CREATE_URL = "כאן_כתובת_יצירה";
+const STATUS_URL = "כאן_כתובת_בדיקת_סטטוס";
+
+async function createSong() {
+  const prompt = document.getElementById("prompt").value;
+  const status = document.getElementById("status");
+  status.innerText = "🔄 שולח בקשה ליצירה...";
+
+  const res = await fetch(CREATE_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      prompt: prompt,
+      instrumental: false
+    })
+  });
+
+  const data = await res.json();
+  const taskId = data.task_id || data.taskId;
+
+  status.innerText = "⏳ יוצר שיר...";
+
+  checkStatus(taskId);
+}
+
+async function checkStatus(taskId) {
+  const status = document.getElementById("status");
+
+  const interval = setInterval(async () => {
+    const res = await fetch(`${STATUS_URL}?task_id=${taskId}`, {
+      headers: {
+        "Authorization": "Bearer " + API_KEY"
+      }
+    });
+
+    const data = await res.json();
+
+    if (data.status === "completed") {
+      clearInterval(interval);
+      status.innerText = "✅ השיר מוכן!";
+
+      const audioBlob = base64ToBlob(data.audio_base64, "audio/mpeg");
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      document.getElementById("player").src = audioUrl;
+    }
+
+    if (data.status === "failed") {
+      clearInterval(interval);
+      status.innerText = "❌ היצירה נכשלה";
+    }
+  }, 5000);
+}
+
+function base64ToBlob(base64, type) {
+  const bytes = atob(base64);
+  let arr = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i++) {
+    arr[i] = bytes.charCodeAt(i);
+  }
+  return new Blob([arr], { type });
+}
+</script>
 
-        <form id="chatForm" class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">בחירת מודל AI</label>
-                <div class="flex items-center space-x-6 space-x-reverse">
-                    <div class="flex items-center">
-                        <input type="radio" id="modelRegular" name="model" value="regular"
-                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 cursor-pointer">
-                        <label for="modelRegular" class="mr-2 block text-sm font-medium text-gray-700 cursor-pointer">
-                            מודל רגיל (מהיר, עלול יותר לטעויות)
-                        </label>
-                    </div>
-                    
-                    <div class="flex items-center">
-                        <input type="radio" id="modelPro" name="model" value="pro"
-                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 cursor-pointer">
-                        <label for="modelPro" class="mr-2 block text-sm font-medium text-gray-700 cursor-pointer">
-                            מודל פרו (איטי, מדוייק יותר, דורש מפתח API פרטי)
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">בחירת API</label>
-                <div class="flex items-center space-x-6 space-x-reverse">
-                    <div class="flex items-center">
-                        <input type="radio" id="apiPublic" name="apiType" value="public"
-                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 cursor-pointer">
-                        <label for="apiPublic" id="apiPublicLabel" class="mr-2 block text-sm font-medium text-gray-700 cursor-pointer">
-                            API ציבורי (ייתכנו הגבלות)
-                        </label>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="radio" id="apiPrivate" name="apiType" value="private"
-                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 cursor-pointer">
-                        <label for="apiPrivate" class="mr-2 text-sm font-medium text-gray-700 cursor-pointer"><a href="https://aistudio.google.com/u/0/api-keys" target="_blank" class="text-blue-600 hover:underline">API פרטי</a> <span id="apiPrivateRecommended">(מומלץ)</span></label>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="apiKeyContainer" class="hidden">
-                <input type="password" id="apiKeyInput" name="apiKey"
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                       placeholder="הזן את מפתח ה-API הפרטי שלך">
-            </div>
-            
-            <div>
-                <div class="flex justify-between items-center mb-2">
-                    <label for="tokenInput" class="block text-sm font-medium text-gray-700">טוקן ימות המשיח (Token)</label>
-                    <div class="flex items-center">
-                        <button type="button" id="openMfaModalButton" class="text-xs text-green-600 hover:underline focus:outline-none ml-3">
-                            צור טוקן מאומת
-                        </button>
-                        <button type="button" id="clearTokenButton" class="text-xs text-blue-500 hover:underline focus:outline-none">
-                            מחק טוקן שמור מהדפדפן
-                        </button>
-                    </div>
-                </div>
-                <input type="password" id="tokenInput" name="token" required
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                       placeholder="הזן את הטוקן שלך כאן">
-            </div>
-            
-            <div>
-                <label for="textInput" class="block text-sm font-medium text-gray-700 mb-2">הבקשה שלך</label>
-                <textarea id="textInput" name="text" rows="4" required
-                          class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="כתוב את בקשתך לAI המתקדם שלנו..."></textarea>
-            </div>
-            
-            <div class="flex items-center bg-blue-50 p-3 rounded-md border border-blue-100">
-                <input type="checkbox" id="previewModeCheckbox" class="focus:ring-blue-500 h-5 w-5 text-blue-600 border-gray-300 rounded cursor-pointer">
-                <label for="previewModeCheckbox" class="mr-2 block text-sm font-medium text-gray-700 cursor-pointer select-none">
-                    הצג פעולות לאישור ידני לפני ביצוע (בטיחותי)
-                </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-                <button type="submit" id="submitButton"
-                        class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
-                    שלח בקשה
-                </button>
-                <div id="loadingSpinner" class="hidden spinner w-6 h-6 border-4 border-gray-200 border-t-blue-500 rounded-full mr-4"></div>
-            </div>
-        </form>
-        
-        <div id="responseContainer" class="mt-8 pt-6 border-t border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">סטטוס / פעולות:</h2>
-            
-            <div id="responseArea"
-                 class="w-full min-h-[100px] bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-600 whitespace-pre-wrap">
-                ...התשובה תופיע כאן...
-            </div>
-
-            <div id="actionsListArea" class="hidden w-full bg-white rounded-lg border border-gray-200 overflow-hidden">
-                </div>
-
-            <div id="errorArea" class="hidden mt-4 text-red-600 font-medium p-3 bg-red-50 rounded-lg border border-red-300"></div>
-        </div>
-    </div>
-
-
-    <div id="mfaModalOverlay" class="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 hidden"></div>
-    <div id="mfaModalContainer" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-        
-        <div class="bg-white rounded-lg shadow-2xl relative w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <button id="closeMfaModalButton" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 z-10">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            
-            <div class="p-8">
-                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">תהליך יצירת טוקן מאומת</h1>
-
-                <div id="loginPanel" class="panel">
-                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">יצירת טוקן</h2>
-                    
-                    <div id="loginError" class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300" role="alert" style="display: none;">
-                        </div>
-                    
-                    <div class="space-y-4">
-                        
-                        <div class="mb-4"> 
-                            <div class="flex items-center">
-                                <input type="checkbox" id="logoutAfterSubmit" name="logout" checked
-                                       class="focus:ring-red-500 h-4 w-4 text-red-600 border-gray-300 rounded cursor-pointer">
-                                <label for="logoutAfterSubmit" class="mr-2 block text-sm font-medium text-gray-700 cursor-pointer">
-                                    ניתוק הטוקן אחר שליחה (הניתוק לא יתבצע אם תבחרו הצגת פעולות לאישור ידני)
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700">מספר מערכת</label>
-                            <input type="text" id="username" value="" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="מספר מערכת">
-                        </div>
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700">סיסמה</label>
-                            <input type="password" id="password" value="" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="סיסמת ניהול">
-                        </div>
-                        <button id="loginButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            המשך
-                        </button>
-                    </div>
-                </div>
-
-                <div id="mfaPanel" class="panel">
-                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">אימות דו-שלבי</h2>
-                    
-                    <div id="mfaError" class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300" role="alert" style="display: none;">
-                        </div>
-
-                    <div id="methodSelection" class="space-y-4">
-                        <div>
-                            <label for="mfaMethods" class="block text-sm font-medium text-gray-700">בחר שיטת אימות</label>
-                            <select id="mfaMethods" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"></select>
-                        </div>
-                        <div>
-                            <label for="mfaSendType" class="block text-sm font-medium text-gray-700">בחר סוג שליחה</label>
-                            <select id="mfaSendType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"></select>
-                        </div>
-                        <button id="sendCodeButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            שלח קוד אימות
-                        </button>
-                    </div>
-
-                    <div id="codeValidation" class="space-y-4 mt-6" style="display: none;">
-                        <div>
-                            <label for="mfaCode" class="block text-sm font-medium text-gray-700">הזן קוד אימות</label>
-                            <input type="text" id="mfaCode" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="הזן את הקוד שהתקבל">
-                        </div>
-                        <button id="validateCodeButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            אמת קוד
-                        </button>
-                    </div>
-                </div>
-
-                <div id="successPanel" class="panel text-center">
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                        <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800 mt-4">אימות הושלם בהצלחה!</h2>
-                    <p id="mfaSuccessMessage" class="text-gray-600 mt-2 font-medium">מעביר את הטוקן...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
-        const chatForm = document.getElementById('chatForm');
-        const tokenInput = document.getElementById('tokenInput');
-        const clearTokenButton = document.getElementById('clearTokenButton');
-        const textInput = document.getElementById('textInput');
-        const submitButton = document.getElementById('submitButton');
-        const responseArea = document.getElementById('responseArea');
-        const actionsListArea = document.getElementById('actionsListArea'); // אלמנט חדש לרשימת פעולות
-        const previewModeCheckbox = document.getElementById('previewModeCheckbox'); // אלמנט חדש לצ'קבוקס
-        const errorArea = document.getElementById('errorArea');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const modelRegularRadio = document.getElementById('modelRegular');
-        const modelProRadio = document.getElementById('modelPro');
-        const apiPublicRadio = document.getElementById('apiPublic');
-        const apiPrivateRadio = document.getElementById('apiPrivate');
-        const apiKeyContainer = document.getElementById('apiKeyContainer');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const apiPublicLabel = document.getElementById('apiPublicLabel');
-        const apiPrivateRecommendedText = document.getElementById('apiPrivateRecommended');
-        const YOUR_API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxSGOU5SD1yCvn7kRiF9N8rhpwT-traCP6Vyk4w6otweC36h8lyb_YEyxmNKnU60he7/exec';
-        const TOKEN_STORAGE_KEY = 'chatAppToken';
-        const MODEL_STORAGE_KEY = 'chatAppModel';
-        const API_TYPE_STORAGE_KEY = 'chatAppApiType';
-        const API_KEY_STORAGE_KEY = 'chatAppApiKey';
-
-        let lastUserApiType = 'public';
-        let currentToken = null;
-        let mfaMethodsCache = [];
-        const REQUIRES_HARD_MFA_REASONS = ['INIT_WHITELIST_IPS', 'HAVE_ACTIVE_TRUST_TOKEN'];
-        const API_BASE_URL = "https://www.call2all.co.il/ym/api/";
-
-        const loginPanel = document.getElementById('loginPanel');
-        const mfaPanel = document.getElementById('mfaPanel');
-        const successPanel = document.getElementById('successPanel');
-        const loginError = document.getElementById('loginError');
-        const mfaError = document.getElementById('mfaError');
-        const mfaSuccessMessageElement = document.getElementById('mfaSuccessMessage'); 
-        const logoutAfterSubmitCheckbox = document.getElementById('logoutAfterSubmit');
-
-        const loginButton = document.getElementById('loginButton');
-        const mfaMethodsSelect = document.getElementById('mfaMethods');
-        const mfaSendTypeSelect = document.getElementById('mfaSendType');
-        const sendCodeButton = document.getElementById('sendCodeButton');
-        const codeValidation = document.getElementById('codeValidation');
-        const mfaCodeInput = document.getElementById('mfaCode');
-        const validateCodeButton = document.getElementById('validateCodeButton');
-        
-        const openMfaModalButton = document.getElementById('openMfaModalButton');
-        const closeMfaModalButton = document.getElementById('closeMfaModalButton');
-        const mfaModalOverlay = document.getElementById('mfaModalOverlay');
-        const mfaModalContainer = document.getElementById('mfaModalContainer');
-
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadToken();
-            loadSettings();
-
-            loginButton.addEventListener('click', handleLogin);
-            mfaMethodsSelect.addEventListener('change', updateSendTypes);
-            sendCodeButton.addEventListener('click', handleSendCode);
-            validateCodeButton.addEventListener('click', handleValidateCode);
-        });
-        
-        function openMfaModal() {
-            console.log("Opening MFA Modal");
-            showPanel('loginPanel');
-            hideError('login');
-            hideError('mfa');
-            
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            mfaCodeInput.value = '';
-            codeValidation.style.display = 'none'; 
-
-            mfaModalOverlay.classList.remove('hidden');
-            mfaModalContainer.classList.remove('hidden');
-        }
-
-        function closeMfaModal() {
-            console.log("Closing MFA Modal");
-            mfaModalOverlay.classList.add('hidden');
-            mfaModalContainer.classList.add('hidden');
-        }
-        
-        openMfaModalButton.addEventListener('click', openMfaModal);
-        closeMfaModalButton.addEventListener('click', closeMfaModal);
-        mfaModalOverlay.addEventListener('click', closeMfaModal);
-
-        clearTokenButton.addEventListener('click', () => {
-            localStorage.removeItem(TOKEN_STORAGE_KEY);
-            tokenInput.value = '';
-            showResponse('הטוקן השמור נמחק.');
-        });
-
-        apiPublicRadio.addEventListener('change', handleApiTypeChange);
-        apiPrivateRadio.addEventListener('change', handleApiTypeChange);
-        modelRegularRadio.addEventListener('change', handleModelChange);
-        modelProRadio.addEventListener('change', handleModelChange);
-        apiKeyInput.addEventListener('input', saveSettings);
-
-        function loadToken() {
-            const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-            if (savedToken) {
-                tokenInput.value = savedToken;
-            }
-        }
-
-        function saveToken(token) {
-            localStorage.setItem(TOKEN_STORAGE_KEY, token);
-        }
-
-        function loadSettings() {
-            const savedModel = localStorage.getItem(MODEL_STORAGE_KEY) || 'regular';
-            const modelRadio = document.querySelector(`input[name="model"][value="${savedModel}"]`);
-            if (modelRadio) {
-                modelRadio.checked = true;
-            }
-
-            const savedApiType = localStorage.getItem(API_TYPE_STORAGE_KEY) || 'public';
-            const apiTypeRadio = document.querySelector(`input[name="apiType"][value="${savedApiType}"]`);
-            if (apiTypeRadio) {
-                apiTypeRadio.checked = true;
-            }
-
-            lastUserApiType = savedApiType;
-            apiKeyInput.value = localStorage.getItem(API_KEY_STORAGE_KEY) || '';
-            updateApiStateBasedOnModel();
-        }
-
-        function saveSettings() {
-            const selectedModel = document.querySelector('input[name="model"]:checked').value;
-            const selectedApiType = document.querySelector('input[name="apiType"]:checked').value;
-            const apiKey = apiKeyInput.value;
-
-            localStorage.setItem(MODEL_STORAGE_KEY, selectedModel);
-            localStorage.setItem(API_TYPE_STORAGE_KEY, selectedApiType);
-            localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-        }
-
-        function handleApiTypeChange() {
-            const isPrivate = apiPrivateRadio.checked;
-            toggleApiKeyInput(isPrivate);
-            if (!modelProRadio.checked) {
-                lastUserApiType = document.querySelector('input[name="apiType"]:checked').value;
-            }
-            saveSettings();
-        }
-
-        function handleModelChange() {
-            if (modelProRadio.checked) {
-                lastUserApiType = document.querySelector('input[name="apiType"]:checked').value;
-            }
-            updateApiStateBasedOnModel();
-            saveSettings();
-        }
-
-        function updateApiStateBasedOnModel() {
-            if (modelProRadio.checked) {
-                apiPublicRadio.disabled = true;
-                apiPrivateRadio.checked = true;
-                toggleApiKeyInput(true);
-                apiPrivateRecommendedText.textContent = '(דרוש)';
-                apiPublicLabel.classList.remove('text-gray-700');
-                apiPublicLabel.classList.add('text-gray-400');
-
-            } else {
-                apiPublicRadio.disabled = false;
-                apiPrivateRecommendedText.textContent = '(מומלץ)';
-                apiPublicLabel.classList.add('text-gray-700');
-                apiPublicLabel.classList.remove('text-gray-400');
-
-                if (lastUserApiType === 'public') {
-                    apiPublicRadio.checked = true;
-                    toggleApiKeyInput(false);
-                } else {
-                    apiPrivateRadio.checked = true;
-                    toggleApiKeyInput(true);
-                }
-            }
-        }
-
-        function toggleApiKeyInput(show) {
-            if (show) {
-                apiKeyContainer.classList.remove('hidden');
-            } else {
-                apiKeyContainer.classList.add('hidden');
-            }
-        }
-
-        chatForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const token = tokenInput.value.trim();
-            const text = textInput.value.trim();
-            const selectedModel = chatForm.querySelector('input[name="model"]:checked').value;
-            const selectedApiType = chatForm.querySelector('input[name="apiType"]:checked').value;
-            const apiKey = apiKeyInput.value.trim();
-            const logout = logoutAfterSubmitCheckbox.checked;
-            const isPreviewMode = previewModeCheckbox.checked;
-            
-            if (!token || !text) {
-                showError('נא למלא את שדה הטוקן ושדה הבקשה.');
-                return;
-            }
-            if (selectedApiType === 'private' && !apiKey) {
-                showError('נא למלא מפתח API פרטי.');
-                return;
-            }
-            
-            saveToken(token);
-            saveSettings();
-            setLoadingState(true);
-
-            try {
-                const params = new URLSearchParams({
-                    token: token,
-                    text: text
-                });
-                
-                if (selectedModel === 'pro') {
-                    params.append('model', 'pro');
-                }
-
-                if (selectedApiType === 'private') {
-                    params.append('key', apiKey);
-                }
-                
-                if (logout) {
-                    params.append('Logout', 'yes');
-                }
-
-                if (isPreviewMode) {
-                    params.append('Fullanswer', 'yes');
-                }
-
-                const url = `${YOUR_API_ENDPOINT}?${params.toString()}`;
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json, text/plain, */*'
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`שגיאת שרת: ${response.status} ${response.statusText}`);
-                }
-                const responseData = await response.text();
-                
-                if (isPreviewMode) {
-                    renderActionList(responseData);
-                } else {
-                    showResponse(responseData);
-                }
-
-            } catch (error) {
-                console.error('אירעה שגיאה:', error);
-                showError(`אירעה שגיאה: ${error.message}. בדוק את חיבור האינטרנט או את מסוף הדפדפן.`);
-            } finally {
-                setLoadingState(false);
-            }
-        });
-
-        function setLoadingState(isLoading) {
-            if (isLoading) {
-                submitButton.disabled = true;
-                submitButton.textContent = 'שולח...';
-                loadingSpinner.classList.remove('hidden');
-                errorArea.classList.add('hidden'); 
-                responseArea.textContent = '...מעבד בקשה...';
-                actionsListArea.classList.add('hidden');
-                responseArea.classList.remove('hidden');
-            } else {
-                submitButton.disabled = false;
-                submitButton.textContent = 'שלח בקשה';
-                loadingSpinner.classList.add('hidden');
-            }
-        }
-
-        function showResponse(data) {
-            actionsListArea.classList.add('hidden');
-            responseArea.classList.remove('hidden');
-            responseArea.textContent = data;
-            errorArea.classList.add('hidden');
-        }
-
-        function showError(message) {
-            errorArea.textContent = message;
-            errorArea.classList.remove('hidden');
-            responseArea.textContent = '...אירעה שגיאה...'; 
-            actionsListArea.classList.add('hidden');
-        }
-        function renderActionList(rawData) {
-            responseArea.classList.add('hidden');
-            actionsListArea.classList.remove('hidden');
-            actionsListArea.innerHTML = '';
-
-            const lines = rawData.split('\n');
-            let currentExplanation = '';
-            let actionsFound = 0;
-
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'bg-gray-50 p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10';
-            
-            const titleSpan = document.createElement('span');
-            titleSpan.className = 'font-bold text-gray-700';
-            titleSpan.textContent = 'אשר את הפעולות שברצונך לבצע:';
-            
-            // --- יצירת כפתור "בצע הכל" ---
-            const executeAllBtn = document.createElement('button');
-            executeAllBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-bold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500';
-            executeAllBtn.textContent = '⚡ בצע הכל';
-            executeAllBtn.style.display = 'none';
-            
-            executeAllBtn.onclick = async () => {
-                if (!confirm('האם אתה בטוח שברצונך לבצע את כל הפעולות ברשימה?')) return;
-                
-                executeAllBtn.disabled = true;
-                executeAllBtn.textContent = 'מבצע...';
-                executeAllBtn.classList.replace('bg-blue-600', 'bg-gray-400');
-
-                const allButtons = actionsListArea.querySelectorAll('.action-execute-btn');
-                
-                for (const btn of allButtons) {
-                    if (!btn.disabled && !btn.classList.contains('hidden')) {
-                        btn.click();
-                        await new Promise(resolve => setTimeout(resolve, 300));
-                    }
-                }
-                
-                executeAllBtn.textContent = 'הפעולות נשלחו';
-            };
-
-            headerDiv.appendChild(titleSpan);
-            headerDiv.appendChild(executeAllBtn);
-            actionsListArea.appendChild(headerDiv);
-
-            lines.forEach(line => {
-                const trimmedLine = line.trim();
-                
-                if (trimmedLine.startsWith('הסבר:')) {
-                    currentExplanation = trimmedLine.replace('הסבר:', '').trim();
-                } else if (trimmedLine.startsWith('https://www.call2all.co.il/ym/api/')) {
-                    actionsFound++;
-                    const url = trimmedLine;
-                    const explanation = currentExplanation || 'פעולה ללא הסבר';
-                    
-                    createActionItem(explanation, url);
-                    
-                    currentExplanation = '';
-                } else if (trimmedLine.startsWith('הבהרה:') || trimmedLine.startsWith('⚠️')) {
-                    const noteDiv = document.createElement('div');
-                    noteDiv.className = 'p-4 bg-yellow-50 text-yellow-800 text-sm border-b border-yellow-100';
-                    noteDiv.textContent = trimmedLine;
-                    actionsListArea.appendChild(noteDiv);
-                }
-            });
-
-            if (actionsFound > 0) {
-                executeAllBtn.style.display = 'block';
-            } else {
-                 const emptyDiv = document.createElement('div');
-                 emptyDiv.className = 'p-6 text-center text-gray-500';
-                 emptyDiv.textContent = 'לא נמצאו פעולות לביצוע בתשובה שהתקבלה (או שהתשובה היא טקסט חופשי).';
-                 actionsListArea.appendChild(emptyDiv);
-                 
-                 const originalTextDiv = document.createElement('div');
-                 originalTextDiv.className = 'p-4 text-sm text-gray-600 whitespace-pre-wrap border-t';
-                 originalTextDiv.textContent = rawData;
-                 actionsListArea.appendChild(originalTextDiv);
-            }
-        }
-
-        function createActionItem(explanation, url) {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'action-item p-4 border-b border-gray-100 flex items-center justify-between';
-            
-            const textDiv = document.createElement('div');
-            textDiv.className = 'flex-1 ml-4';
-            
-            const title = document.createElement('div');
-            title.className = 'font-medium text-gray-800';
-            title.textContent = explanation;
-            
-            const subTitle = document.createElement('div');
-            subTitle.className = 'text-xs text-gray-500 truncate max-w-md';
-            subTitle.textContent = url;
-            
-            textDiv.appendChild(title);
-            textDiv.appendChild(subTitle);
-            
-            const button = document.createElement('button');
-            button.className = 'action-execute-btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1';
-            button.textContent = 'בצע';
-            
-            const statusIcon = document.createElement('div');
-            statusIcon.className = 'hidden text-2xl ml-2';
-            
-            button.onclick = async () => {
-                button.disabled = true;
-                button.textContent = '...';
-                button.classList.replace('bg-green-600', 'bg-gray-400');
-                
-                const token = tokenInput.value.trim();
-                // הוספת הטוקן ל-URL
-                const fullUrl = url + "&token=" + encodeURIComponent(token);
-                
-                try {
-                    const response = await fetch(fullUrl);
-                    const data = await response.json();
-                    
-                    if (data.responseStatus === 'OK') {
-                        button.classList.add('hidden');
-                        statusIcon.textContent = '✅';
-                        statusIcon.className = 'text-2xl text-green-500 block';
-                        itemDiv.classList.add('bg-green-50');
-                    } else {
-                         throw new Error(data.message || 'שגיאה בימות המשיח');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    button.textContent = 'שגיאה';
-                    button.classList.replace('bg-gray-400', 'bg-red-600');
-                    button.disabled = false;
-                    
-                    if (!textDiv.querySelector('.error-msg')) {
-                        const errorMsg = document.createElement('div');
-                        errorMsg.className = 'error-msg text-red-600 text-xs mt-1';
-                        errorMsg.textContent = 'נכשל: ' + err.message;
-                        textDiv.appendChild(errorMsg);
-                    }
-                }
-            };
-
-            itemDiv.appendChild(textDiv);
-            itemDiv.appendChild(statusIcon);
-            itemDiv.appendChild(button);
-            actionsListArea.appendChild(itemDiv);
-        }
-        
-        async function realApi(action, params = {}) {
-            const queryParams = new URLSearchParams(params);
-            const url = `${API_BASE_URL}${action}?${queryParams.toString()}`;
-            
-            console.log(`> API Real: GET ${url.replace(params.password, '••••')}`);
-
-            try {
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`שגיאת רשת: ${response.status} ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log(`< API Real: ${JSON.stringify(data)}`);
-                return data;
-
-            } catch (error) {
-                console.log(`שגיאה בקריאת API אמיתית (${action}): ${error.message}`);
-                return { responseStatus: "Exception", message: error.message };
-            }
-        }
-
-        function showError(panelId, message) {
-            if (panelId === 'login' || panelId === 'mfa') {
-                 const errorEl = (panelId === 'login') ? loginError : mfaError;
-                 errorEl.textContent = message;
-                 errorEl.style.display = 'block';
-            } else {
-                 // שגיאה כללית של המערכת
-                 errorArea.textContent = message;
-                 errorArea.classList.remove('hidden');
-                 actionsListArea.classList.add('hidden');
-            }
-        }
-
-        function hideError(panelId) {
-            const errorEl = (panelId === 'login') ? loginError : mfaError;
-            errorEl.style.display = 'none';
-        }
-
-        function updateMfaSuccessMessage(isHardMfaRequired) {
-            if (isHardMfaRequired) {
-                mfaSuccessMessageElement.textContent = 'אימות דו-שלבי הושלם בהצלחה. הטוקן המאומת מוכן לשימוש.';
-            } else {
-                mfaSuccessMessageElement.textContent = 'זוהה פטור מאימות דו-שלבי. הטוקן מוכן לשימוש.';
-            }
-        }
-
-        function showPanel(panelId) {
-            if (panelId === 'successPanel') {
-                console.log("MFA Success! Token received: " + currentToken);
-                if (currentToken) {
-                    tokenInput.value = currentToken; 
-                    saveToken(currentToken);        
-                    showResponse('טוקן מאומת נוצר ונשמר בהצלחה.'); 
-                    [loginPanel, mfaPanel, successPanel].forEach(panel => {
-                        panel.style.display = (panel.id === panelId) ? 'block' : 'none';
-                    });
-                    
-                    setTimeout(closeMfaModal, 1500);
-                } else {
-                    showError('mfa', 'האימות הצליח אך התקבל טוקן ריק.');
-                }
-                return; 
-            }
-
-            [loginPanel, mfaPanel, successPanel].forEach(panel => {
-                panel.style.display = (panel.id === panelId) ? 'block' : 'none';
-            });
-        }
-
-        function analyzeMfaStatus(mfaStatus) {
-            if (mfaStatus.isPass) {
-                if (REQUIRES_HARD_MFA_REASONS.includes(mfaStatus.passReason)) {
-                    return 'NEEDS_HARD_MFA';
-                } else {
-                    return 'SUCCESS';
-                }
-            } else {
-                return 'NEEDS_MFA';
-            }
-        }
-
-        async function handleLogin() {
-            hideError('login');
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                showError('login', 'יש להזין מספר מערכת וסיסמה.');
-                return;
-            }
-            
-            const loginResponse = await realApi('Login', { username, password });
-            
-            if (loginResponse.responseStatus === "OK" && loginResponse.token) {
-                currentToken = loginResponse.token;
-                await checkMfaStatus();
-            } else {
-                const errorMessage = loginResponse.message || (loginResponse.token ? 'תגובה לא תקינה' : 'טוקן לא התקבל');
-                showError('login', `ההתחברות נכשלה: ${errorMessage}`);
-            }
-        }
-
-        async function checkMfaStatus() {
-            const statusResponse = await realApi('MFASession', { token: currentToken, action: 'isPass' });
-            const nextStep = analyzeMfaStatus(statusResponse);
-
-            switch (nextStep) {
-                case 'SUCCESS':
-                    updateMfaSuccessMessage(false); 
-                    showPanel('successPanel'); 
-                    break;
-                case 'NEEDS_HARD_MFA':
-                    await getMfaMethods();
-                    break;
-                case 'NEEDS_MFA':
-                    const tryResponse = await realApi('MFASession', { token: currentToken, action: 'try' });
-                    const tryNextStep = analyzeMfaStatus(tryResponse);
-                    
-                    if (tryNextStep === 'SUCCESS') {
-                        updateMfaSuccessMessage(false); 
-                        showPanel('successPanel'); 
-                    } else {
-                        await getMfaMethods();
-                    }
-                    break;
-            }
-        }
-
-        async function getMfaMethods() {
-            hideError('mfa');
-            showPanel('mfaPanel'); 
-            
-            const response = await realApi('MFASession', { token: currentToken, action: 'getMFAMethods' });
-            
-            if (response.mfaMethods && response.mfaMethods.length > 0) {
-                document.getElementById('methodSelection').style.display = 'block';
-                mfaMethodsCache = response.mfaMethods;
-                mfaMethodsSelect.innerHTML = mfaMethodsCache
-                    .map(method => `<option value="${method.ID}">${method.VALUE} (${method.NIKE})</option>`)
-                    .join('');
-                
-                updateSendTypes();
-            } else {
-                showError('mfa', 'לא נמצאו שיטות אימות זמינות. יש להגדיר שיטות במערכת.');
-                document.getElementById('methodSelection').style.display = 'none';
-            }
-        }
-
-        function updateSendTypes() {
-            const selectedId = mfaMethodsSelect.value;
-            const selectedMethod = mfaMethodsCache.find(m => m.ID == selectedId);
-            
-            if (selectedMethod) {
-                mfaSendTypeSelect.innerHTML = selectedMethod.SEND_TYPE
-                    .map(type => `<option value="${type}">${type}</option>`)
-                    .join('');
-            }
-        }
-
-        async function handleSendCode() {
-            hideError('mfa');
-            const mfaId = mfaMethodsSelect.value;
-            const mfaSendType = mfaSendTypeSelect.value;
-            
-            const response = await realApi('MFASession', {
-                token: currentToken,
-                action: 'sendMFA',
-                mfaId: mfaId,
-                mfaSendType: mfaSendType,
-                lang: 'HE'
-            });
-
-            if (response.responseStatus === 'OK') {
-                codeValidation.style.display = 'block';
-            } else {
-                let errorMsg = "שליחת הקוד נכשלה.";
-                if (response.message) {
-                    errorMsg = `שגיאה: ${response.message}`;
-                }
-                showError('mfa', errorMsg);
-            }
-        }
-
-        async function handleValidateCode() {
-            hideError('mfa');
-            const code = mfaCodeInput.value;
-            if (!code) {
-                showError('mfa', 'יש להזין קוד.');
-                return;
-            }
-
-            const response = await realApi('MFASession', {
-                token: currentToken,
-                action: 'validMFA',
-                mfaCode: code,
-                mfaRememberMe: false
-            });
-
-            if (response.mfa_valid_status === 'VALID') {
-                updateMfaSuccessMessage(true); 
-                showPanel('successPanel'); 
-            } else {
-                let errorMsg = "הקוד שהוזן שגוי.";
-                if (response.mfa_valid_status === 'OVERTRY') {
-                    errorMsg = "חרגת ממספר הניסיונות. יש לשלוח קוד חדש.";
-                    codeValidation.style.display = 'none';
-                    mfaCodeInput.value = "";
-                } else if (response.mfa_valid_left !== undefined) {
-                    errorMsg = `קוד שגוי. נותרו ${response.mfa_valid_left} ניסיונות.`;
-                }
-                showError('mfa', errorMsg);
-            }
-        }
-
-    </script>
 </body>
 </html>
