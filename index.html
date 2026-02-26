@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מגן צינתוקים - תיקון Invalid WS</title>
+    <title>מגן צינתוקים - תיקון מלא</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: sans-serif; background: #f0f4f8; }
-        .console { background: #000; color: #0f0; font-family: monospace; padding: 10px; border-radius: 8px; height: 300px; overflow-y: auto; font-size: 12px; }
-        .input-group { margin-bottom: 1.2rem; }
-        label { display: block; font-weight: bold; margin-bottom: 0.4rem; font-size: 0.95rem; }
+        .console { background: #000; color: #0f0; font-family: monospace; padding: 12px; border-radius: 8px; height: 320px; overflow-y: auto; font-size: 12px; }
+        .input-group { margin-bottom: 1.3rem; }
+        label { display: block; font-weight: bold; margin-bottom: 0.4rem; }
         .hidden { display: none; }
     </style>
 </head>
 <body class="p-4">
 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-lg border border-gray-300">
-    <h1 class="text-2xl font-bold text-center mb-8 text-blue-800">מגן צינתוקים - הגדרת IVR</h1>
+    <h1 class="text-2xl font-bold text-center mb-8 text-blue-800">מגן צינתוקים - הגדרה מלאה</h1>
     
     <div id="loginStep">
         <div class="input-group">
@@ -31,7 +31,7 @@
 
     <div id="mfaStep" class="hidden">
         <div class="input-group text-center">
-            <label class="text-orange-600 block mb-2">הזן קוד MFA</label>
+            <label class="text-orange-600 block mb-2">קוד MFA</label>
             <input type="text" id="mfaCode" class="w-full p-4 border-2 border-orange-400 rounded-xl text-center text-3xl tracking-widest font-mono">
         </div>
         <button onclick="verifyMfa()" class="w-full bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold">אמת קוד</button>
@@ -39,22 +39,22 @@
 
     <div id="configStep" class="hidden">
         <div class="input-group">
-            <label>מספר היעד (נייד)</label>
+            <label>מספר יעד (נייד)</label>
             <input type="text" id="target" class="w-full p-3 border rounded-lg" placeholder="0501234567">
         </div>
         <div class="input-group">
-            <label>קובץ שמע (M0000.wav או 200/M0000.wav)</label>
+            <label>קובץ שמע (לשלוחה 200)</label>
             <input type="file" id="audio" class="w-full p-2 border border-dashed rounded-lg">
         </div>
         <div class="input-group">
             <label>מספרים לאישור ידני (שורה לכל מספר)</label>
-            <textarea id="manual" class="w-full p-3 border rounded-lg h-24" placeholder="0501111111&#10;0522222222"></textarea>
+            <textarea id="manual" class="w-full p-3 border rounded-lg h-28" placeholder="0501111111&#10;0522222222"></textarea>
         </div>
-        <button onclick="runSetup()" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg font-bold text-lg">🚀 החל הגדרות במערכת</button>
+        <button onclick="runSetup()" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg font-bold text-lg">🚀 צור שלוחות + WhiteList</button>
     </div>
 
     <div class="mt-8">
-        <label class="block mb-2 font-bold">לוג פעולות:</label>
+        <label class="block mb-2 font-bold">לוג פעולות (בדוק כאן):</label>
         <div id="log" class="console"></div>
     </div>
 </div>
@@ -76,14 +76,11 @@
         printLog(`→ ${method}`);
         const fd = new FormData();
         for (const k in params) fd.append(k, params[k]);
-
         try {
             const r = await fetch(API_URL + method, { method: 'POST', body: fd });
             const data = await r.json();
             printLog(`← ${method}: ${data.responseStatus || 'ERROR'}`);
-            if (data.responseStatus === 'EXCEPTION' || data.responseStatus === 'ERROR') {
-                printLog(`שגיאה: ${data.exceptionMessage || data.message || JSON.stringify(data)}`, true);
-            }
+            if (data.responseStatus !== 'OK') printLog(`שגיאה: ${data.message || data.exceptionMessage || JSON.stringify(data)}`, true);
             return data;
         } catch (e) {
             printLog(`שגיאת רשת: ${e.message}`, true);
@@ -104,9 +101,7 @@
             } else {
                 document.getElementById('configStep').classList.remove('hidden');
             }
-        } else {
-            alert("שגיאת התחברות: " + (res.message || 'בדוק פרטים'));
-        }
+        } else alert("שגיאת התחברות");
     }
 
     async function verifyMfa() {
@@ -116,16 +111,15 @@
             printLog("✅ MFA הצליח!");
             document.getElementById('mfaStep').classList.add('hidden');
             document.getElementById('configStep').classList.remove('hidden');
-        } else {
-            alert("קוד שגוי או פג תוקף");
-        }
+        } else alert("קוד שגוי");
     }
 
-    // ====================== פונקציות מתוקנות ======================
-    async function updateExtIni(folder, configStr) {
-        const what = folder === '' ? 'ivr2:/ext.ini' : `ivr2:${folder}/ext.ini`;
-        printLog(`מעדכן ext.ini → ${what}`);
-        return await req('UploadTextFile', { token, what, contents: configStr });
+    // ====================== UpdateExtension - יוצר שלוחות =================
+    async function updateExtension(extPath, settings) {
+        printLog(`יוצר/מעדכן שלוחה: ${extPath}`);
+        const params = { token, path: `ivr2:${extPath}` };
+        for (const key in settings) params[key] = settings[key];
+        return await req('UpdateExtension', params);
     }
 
     async function runSetup() {
@@ -135,52 +129,54 @@
 
         if (!targetNum) return alert("חסר מספר יעד!");
 
-        // 1. ext.ini ראשי
-        const mainIni = [
-            'type=nitoviya',
-            `nitoviya_dial_to=${targetNum}`,
-            'white_list=yes',
-            'white_list_by_key=yes',
-            'white_list_By_key_not_found_by_value=yes',
-            'white_list_error_goto=/200',
-            'say_m1102=no'
-        ].join('\n');
-        await updateExtIni('', mainIni);
+        // 1. שלוחה ראשית - ניטוביה
+        await updateExtension('', {
+            type: 'nitoviya',
+            nitoviya_dial_to: targetNum,
+            white_list: 'yes',
+            white_list_by_key: 'yes',
+            white_list_By_key_not_found_by_value: 'yes',
+            white_list_error_goto: '/200',
+            say_m1102: 'no'
+        });
 
-        // 2. שלוחה 200
-        await updateExtIni('200', 'type=menu');
+        // 2. שלוחה 200 - תפריט
+        await updateExtension('200', { type: 'menu' });
 
         // 3. שלוחה 200/1 - הוספה לרשימה לבנה
-        const addIni = [
-            'type=add_id_to_list',
-            'title=הוספה לרשימה לבנה',
-            'add_id_to_list_location_list=../../WhiteList.ini',   // מתוקן - root
-            'add_id_to_list_value=yes',
-            'add_id_to_list_value_change=yes',
-            'add_id_to_list_end_goto=/',
-            'add_id_to_list_error_end_goto=hangup'
-        ].join('\n');
-        await updateExtIni('200/1', addIni);
+        await updateExtension('200/1', {
+            type: 'add_id_to_list',
+            title: 'הוספה לרשימה לבנה',
+            add_id_to_list_location_list: '../../WhiteList.ini',
+            add_id_to_list_value: 'yes',
+            add_id_to_list_value_change: 'yes',
+            add_id_to_list_end_goto: '/',
+            add_id_to_list_error_end_goto: 'hangup'
+        });
 
-        // 4. WhiteList.ini
+        // 4. WhiteList.ini בשלוחה הראשית
         if (manualList) {
             printLog("מעדכן WhiteList.ini");
             const dl = await req('GetTextFile', { token, what: 'ivr2:/WhiteList.ini' });
             let content = (dl.responseStatus === 'OK' && dl.contents) ? dl.contents : '';
             const newLines = manualList.split('\n').map(s => s.trim()).filter(Boolean).join('\n');
-            const final = content ? (content + '\n' + newLines) : newLines;
+            const finalContent = content ? (content + '\n' + newLines) : newLines;
 
-            await req('UploadTextFile', { token, what: 'ivr2:/WhiteList.ini', contents: final });
+            await req('UploadTextFile', {
+                token,
+                what: 'ivr2:/WhiteList.ini',
+                contents: finalContent
+            });
         }
 
-        // 5. העלאת שמע (השארת כמו שהיה - עובד)
+        // 5. העלאת שמע לשלוחה 200
         if (audioFile) {
-            printLog("מעלה שמע...");
+            printLog("מעלה שמע לשלוחה 200");
             await req('UploadFile', { token, path: '200', file: audioFile });
         }
 
-        printLog("✅ הכל הסתיים בהצלחה! בדוק את המערכת.");
-        alert("הגדרות נשמרו! 🎉");
+        printLog("✅ הכל נוצר בהצלחה! שלוחות 200 + 200/1 + WhiteList.ini");
+        alert("הכל מוכן! 🎉\nרענן את דף הניהול של ימות כדי לראות את השלוחות.");
     }
 </script>
 </body>
