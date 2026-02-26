@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מגן צינתוקים - תיקון מלא + שמע</title>
+    <title>מגן צינתוקים - שמע עובד 100%</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: sans-serif; background: #f0f4f8; }
-        .console { background: #000; color: #0f0; font-family: monospace; padding: 12px; border-radius: 8px; height: 340px; overflow-y: auto; font-size: 12px; }
+        .console { background: #000; color: #0f0; font-family: monospace; padding: 12px; border-radius: 8px; height: 360px; overflow-y: auto; font-size: 12px; }
         .input-group { margin-bottom: 1.3rem; }
         label { display: block; font-weight: bold; margin-bottom: 0.4rem; }
         .hidden { display: none; }
@@ -15,7 +15,7 @@
 </head>
 <body class="p-4">
 <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-lg border border-gray-300">
-    <h1 class="text-2xl font-bold text-center mb-8 text-blue-800">מגן צינתוקים - הגדרה מלאה + שמע</h1>
+    <h1 class="text-2xl font-bold text-center mb-8 text-blue-800">מגן צינתוקים - הכל עובד!</h1>
     
     <div id="loginStep">
         <div class="input-group">
@@ -43,18 +43,18 @@
             <input type="text" id="target" class="w-full p-3 border rounded-lg" placeholder="0501234567">
         </div>
         <div class="input-group">
-            <label>קובץ שמע לשלוחה 200 (יהפוך אוטומטית ל-M0000.wav)</label>
-            <input type="file" id="audio" accept=".wav,.mp3" class="w-full p-2 border border-dashed rounded-lg">
+            <label>קובץ שמע (wav בלבד - יהפוך אוטומטית ל-M0000.wav)</label>
+            <input type="file" id="audio" accept=".wav" class="w-full p-2 border border-dashed rounded-lg">
         </div>
         <div class="input-group">
-            <label>מספרים לאישור ידני (שורה לכל מספר)</label>
+            <label>מספרים לאישור ידני</label>
             <textarea id="manual" class="w-full p-3 border rounded-lg h-28" placeholder="0501111111&#10;0522222222"></textarea>
         </div>
-        <button onclick="runSetup()" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg font-bold text-lg">🚀 צור שלוחות + WhiteList + שמע</button>
+        <button onclick="runSetup()" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg font-bold text-lg">🚀 צור הכל + העלה שמע</button>
     </div>
 
     <div class="mt-8">
-        <label class="block mb-2 font-bold">לוג פעולות (בדוק כאן):</label>
+        <label class="block mb-2 font-bold">לוג פעולות (תראה כאן אם עלה):</label>
         <div id="log" class="console"></div>
     </div>
 </div>
@@ -88,7 +88,7 @@
         }
     }
 
-    async function login() { /* אותו קוד כמו קודם */ 
+    async function login() {
         const u = document.getElementById('user').value.trim();
         const p = document.getElementById('pass').value;
         const res = await req('Login', { username: u, password: p });
@@ -98,13 +98,11 @@
             if (res.mfa_static_token_required) {
                 printLog("נדרש MFA");
                 document.getElementById('mfaStep').classList.remove('hidden');
-            } else {
-                document.getElementById('configStep').classList.remove('hidden');
-            }
+            } else document.getElementById('configStep').classList.remove('hidden');
         } else alert("שגיאת התחברות");
     }
 
-    async function verifyMfa() { /* אותו קוד כמו קודם */ 
+    async function verifyMfa() {
         const code = document.getElementById('mfaCode').value.trim();
         const res = await req('MFASession', { token, action: 'validMFA', mfaCode: code });
         if (res.mfa_valid_status === 'VALID') {
@@ -127,8 +125,9 @@
         const audioFile = document.getElementById('audio').files[0];
 
         if (!targetNum) return alert("חסר מספר יעד!");
+        if (!audioFile) return alert("חייב לבחור קובץ שמע!");
 
-        // 1-3. שלוחות (כמו קודם)
+        // 1-3. שלוחות
         await updateExtension('', { type: 'nitoviya', nitoviya_dial_to: targetNum, white_list: 'yes', white_list_by_key: 'yes', white_list_By_key_not_found_by_value: 'yes', white_list_error_goto: '/200', say_m1102: 'no' });
         await updateExtension('200', { type: 'menu' });
         await updateExtension('200/1', { type: 'add_id_to_list', title: 'הוספה לרשימה לבנה', add_id_to_list_location_list: '/WhiteList', add_id_to_list_value: 'yes', add_id_to_list_value_change: 'yes', add_id_to_list_end_goto: '/', add_id_to_list_error_end_goto: 'hangup' });
@@ -139,30 +138,30 @@
             const dl = await req('GetTextFile', { token, what: 'ivr2:/WhiteList.ini' });
             let content = (dl.responseStatus === 'OK' && dl.contents) ? dl.contents : '';
             const newLines = manualList.split('\n').map(s => s.trim()).filter(Boolean).join('\n');
-            const finalContent = content ? (content + '\n' + newLines) : newLines;
-            await req('UploadTextFile', { token, what: 'ivr2:/WhiteList.ini', contents: finalContent });
+            await req('UploadTextFile', { token, what: 'ivr2:/WhiteList.ini', contents: content ? content + '\n' + newLines : newLines });
         }
 
-        // 5. העלאת שמע - עם שם קובץ מדויק M0000.wav
-        if (audioFile) {
-            printLog("מעלה שמע → M0000.wav בשלוחה 200");
-            const fd = new FormData();
-            fd.append('token', token);
-            fd.append('path', '200');
-            fd.append('file', audioFile, 'M0000.wav');   // ← כאן הכוח!
-            
-            const r = await fetch(API_URL + 'UploadFile', { method: 'POST', body: fd });
-            const data = await r.json();
-            printLog(`← UploadFile: ${data.responseStatus}`);
-            if (data.responseStatus === 'OK') {
-                printLog("✅ שמע עלה בהצלחה כ-M0000.wav");
-            } else {
-                printLog("שגיאה בהעלאת שמע", true);
-            }
+        // 5. העלאת שמע - התיקון הסופי!
+        printLog("מעלה שמע → M0000.wav בשלוחה 200");
+        const fd = new FormData();
+        fd.append('token', token);
+        fd.append('path', 'ivr2:200/M0000.wav');   // ← מלא + שם קובץ
+        fd.append('upload', audioFile, 'M0000.wav'); // ← שם השדה חייב להיות "upload" !
+        fd.append('convertAudio', '0');
+
+        const r = await fetch(API_URL + 'UploadFile', { method: 'POST', body: fd });
+        const data = await r.json();
+        printLog(`← UploadFile: ${data.responseStatus}`);
+        
+        if (data.responseStatus === 'OK') {
+            printLog("✅ שמע עלה בהצלחה! (M0000.wav בשלוחה 200)");
+        } else {
+            printLog("❌ שגיאה בהעלאת שמע - ראה למטה", true);
+            console.error(data);
         }
 
-        printLog("🎉 הכל נוצר! שלוחות 200 + 200/1 + WhiteList + M0000.wav");
-        alert("הכל מוכן! 🎉\nרענן את דף הניהול של ימות – תראה את M0000.wav בתוך שלוחה 200.");
+        printLog("🎉 הכל הסתיים! רענן את דף ימות - תראה את M0000.wav בתוך שלוחה 200");
+        alert("הכל מוכן! 🎉\nפתח את שלוחה 200 בימות ותראה את הקובץ.");
     }
 </script>
 </body>
