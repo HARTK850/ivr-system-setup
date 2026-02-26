@@ -3,735 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini GIF Maker Pro</title>
-    <!-- טעינת ספריית יצירת ה-GIF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <title>הגדרת מערכת הגנה מצינטוקים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary: #8AB4F8;
-            --primary-hover: #669DF6;
-            --bg-dark: #202124;
-            --bg-card: #2D2E31;
-            --text-main: #E8EAED;
-            --text-secondary: #9AA0A6;
-            --border: #3C4043;
-            --danger: #F28B82;
-            --success: #81C995;
-            --radius: 12px;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* --- Header & API Key --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            padding: 15px 25px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            background: linear-gradient(90deg, #4285F4, #9B72CB, #F867B6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .api-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            background: var(--primary);
-            color: #202124;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        button:hover:not(:disabled) {
-            background: var(--primary-hover);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        button.outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        button.outline:hover {
-            border-color: var(--primary);
-        }
-
-        /* --- Input Section --- */
-        .card {
-            background: var(--bg-card);
-            padding: 25px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        input[type="text"], textarea, input[type="password"] {
-            background: #171717;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            width: 100%;
-            font-size: 1rem;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .controls-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .control-item {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--primary);
-        }
-
-        /* --- Gallery & Preview --- */
-        .workspace {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .workspace {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .frames-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            min-height: 200px;
-            align-content: start;
-        }
-
-        .frame-card {
-            background: #171717;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            aspect-ratio: 1;
-            border: 2px solid transparent;
-            cursor: grab;
-            transition: transform 0.2s;
-        }
-
-        .frame-card.dragging {
-            opacity: 0.5;
-            border-color: var(--primary);
-        }
-
-        .frame-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .frame-card .delete-btn {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: rgba(0,0,0,0.7);
-            color: var(--danger);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            font-size: 14px;
-        }
-
-        .frame-number {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: rgba(0,0,0,0.6);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-
-        .preview-area {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-
-        #gifPreview {
-            width: 100%;
-            max-width: 300px;
-            aspect-ratio: 1;
-            background: #000;
-            border-radius: 8px;
-            object-fit: contain;
-            border: 1px solid var(--border);
-        }
-
-        /* --- Modals --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal {
-            background: var(--bg-card);
-            padding: 30px;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* --- Utils --- */
-        .loader {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 8px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #3C4043;
-            border-radius: 3px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--success);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .status-msg {
-            font-size: 0.9rem;
-            margin-top: 10px;
-            min-height: 1.2em;
-        }
-
-        .status-error { color: var(--danger); }
-        .status-success { color: var(--success); }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        input, textarea { border: 1px solid #e2e8f0; transition: all 0.2s; }
+        input:focus, textarea:focus { border-color: #3b82f6; ring: 2px; ring-color: #bfdbfe; outline: none; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 min-h-screen p-4">
 
-    <!-- API Key Modal -->
-    <div id="apiKeyModal" class="modal-overlay">
-        <div class="modal">
-            <h2>🔐 הגדרת מפתח</h2>
-            <p style="margin: 15px 0; color: var(--text-secondary);">כדי להשתמש ב-Gemini, עליך להזין API Key.</p>
-            <input type="password" id="apiKeyInput" placeholder="הדבק כאן את המפתח (AIza...)" style="margin-bottom: 20px;">
-            <button onclick="saveApiKey()">שמור והתחל</button>
-            <p style="margin-top: 10px; font-size: 0.8rem;">
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">השג מפתח כאן</a>
-            </p>
-        </div>
+    <div class="max-w-xl mx-auto card p-8 mt-10">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-slate-800">מגן צינתוקים IVR</h1>
+            <p class="text-slate-500 mt-2">הגדרת רשימה לבנה חכמה למערכת ימות המשיח</p>
+        </header>
+        
+        <!-- פרטי התחברות -->
+        <section class="space-y-4 mb-8">
+            <div class="flex items-center gap-2 mb-2 text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <h2 class="font-bold">פרטי התחברות למערכת</h2>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" id="systemNumber" placeholder="מספר מערכת" class="p-3 rounded-lg bg-slate-50 w-full">
+                <input type="password" id="systemPassword" placeholder="סיסמה" class="p-3 rounded-lg bg-slate-50 w-full">
+            </div>
+        </section>
+
+        <!-- הגדרות יעד -->
+        <section class="space-y-4 mb-8">
+            <div class="flex items-center gap-2 mb-2 text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.209.388l-2.235 2.235a13.503 13.503 0 01-5.482-5.482l2.235-2.235a1 1 0 00.388-1.209L10.28 4.684A1 1 0 009.332 4H5z" />
+                </svg>
+                <h2 class="font-bold">הגדרות ניתוב</h2>
+            </div>
+            <input type="text" id="targetNumber" placeholder="המספר אליו יופנו השיחות (הנייד שלך)" class="p-3 rounded-lg bg-slate-50 w-full">
+        </section>
+
+        <!-- רשימה לבנה ידנית -->
+        <section class="space-y-4 mb-8">
+            <div class="flex items-center gap-2 mb-2 text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <h2 class="font-bold">מספרים מאושרים מראש (אופציונלי)</h2>
+            </div>
+            <textarea id="manualWhiteList" rows="3" placeholder="הכנס מספרים (אחד בכל שורה)" class="p-3 rounded-lg bg-slate-50 w-full text-left font-mono"></textarea>
+        </section>
+
+        <!-- העלאת הודעה -->
+        <section class="space-y-4 mb-8">
+            <div class="flex items-center gap-2 mb-2 text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+                <h2 class="font-bold">הודעת הסבר (לשלוחה 200)</h2>
+            </div>
+            <input type="file" id="audioFile" accept="audio/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+        </section>
+
+        <button onclick="startSetup()" id="mainBtn" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
+            החל הגדרות במערכת
+        </button>
+
+        <div id="status" class="mt-6 text-center text-sm hidden"></div>
     </div>
 
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>✨ Gemini GIF Pro</h1>
-            <div class="api-controls">
-                <span id="apiStatus" style="font-size: 0.8rem; color: var(--success); display: flex; align-items: center;"></span>
-                <button class="outline" onclick="changeApiKey()">שינוי מפתח</button>
-            </div>
-        </header>
-
-        <!-- Generation Controls -->
-        <div class="card">
-            <div class="input-group">
-                <div>
-                    <label>תיאור התמונה (Prompt)</label>
-                    <textarea id="promptInput" rows="2" placeholder="למשל: A futuristic robot dancing in neon city, pixel art style"></textarea>
-                </div>
-                
-                <div class="controls-row">
-                    <div class="control-item">
-                        <label>מספר פריימים: <span id="framesCountVal">4</span></label>
-                        <input type="range" id="framesCount" min="2" max="8" value="4" oninput="document.getElementById('framesCountVal').innerText = this.value">
-                    </div>
-                    <div class="control-item">
-                        <label>סגנון (אופציונלי)</label>
-                        <input type="text" id="styleInput" placeholder="Cinematic, Cartoon, Oil Painting...">
-                    </div>
-                </div>
-
-                <button id="generateBtn" onclick="startGeneration()">
-                    🎨 צור תמונות
-                </button>
-                <div id="genStatus" class="status-msg"></div>
-            </div>
-        </div>
-
-        <!-- Workspace -->
-        <div class="workspace">
-            <!-- Frames Area -->
-            <div class="card">
-                <h3>🎞️ פריימים (סדר בגרירה)</h3>
-                <div id="framesList" class="frames-container">
-                    <p style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 20px;">
-                        טרם נוצרו תמונות.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Preview Area -->
-            <div class="card preview-area">
-                <h3>👁️ תצוגה מקדימה</h3>
-                <img id="gifPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="GIF Preview">
-                
-                <div style="width: 100%;">
-                    <label>מהירות (FPS): <span id="fpsVal">5</span></label>
-                    <input type="range" id="fpsInput" min="1" max="20" value="5" oninput="updateFPS(this.value)">
-                </div>
-
-                <button id="createGifBtn" onclick="renderGIF()" disabled>
-                    🎞️ צור GIF
-                </button>
-                <a id="downloadLink" style="display: none;"></a>
-                
-                <div style="width: 100%;">
-                    <div class="progress-bar">
-                        <div id="gifProgress" class="progress-fill"></div>
-                    </div>
-                    <div id="gifStatus" class="status-msg" style="text-align: center;"></div>
-                </div>
-            </div>
+    <!-- Loader -->
+    <div id="loader" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex-col items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl text-center">
+            <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p id="loaderStatus" class="font-bold text-slate-700">מעדכן נתונים...</p>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 🛠️ State Management
-        // ==========================================
-        let API_KEY = localStorage.getItem('GEMINI_API_KEY');
-        let frames = []; // Array of base64 images
-        let gifInstance = null;
-        
-        // DOM Elements
-        const els = {
-            apiKeyModal: document.getElementById('apiKeyModal'),
-            apiKeyInput: document.getElementById('apiKeyInput'),
-            promptInput: document.getElementById('promptInput'),
-            styleInput: document.getElementById('styleInput'),
-            framesCount: document.getElementById('framesCount'),
-            generateBtn: document.getElementById('generateBtn'),
-            genStatus: document.getElementById('genStatus'),
-            framesList: document.getElementById('framesList'),
-            gifPreview: document.getElementById('gifPreview'),
-            createGifBtn: document.getElementById('createGifBtn'),
-            gifProgress: document.getElementById('gifProgress'),
-            gifStatus: document.getElementById('gifStatus'),
-            fpsInput: document.getElementById('fpsInput'),
-            fpsVal: document.getElementById('fpsVal')
-        };
+        const API_URL = 'https://www.call2all.co.il/ym/api/';
 
-        // Initialize
-        if (!API_KEY) {
-            els.apiKeyModal.classList.remove('hidden');
-        } else {
-            els.apiKeyModal.classList.add('hidden');
+        async function callApi(method, params) {
+            const fd = new FormData();
+            for (const k in params) fd.append(k, params[k]);
+            const res = await fetch(`${API_URL}${method}`, { method: 'POST', body: fd });
+            return await res.json();
         }
 
-        // ==========================================
-        // 🔐 API Key Handling
-        // ==========================================
-        function saveApiKey() {
-            const key = els.apiKeyInput.value.trim();
-            if (key.length < 10) {
-                alert('נראה שהמפתח קצר מדי, בדוק שוב.');
-                return;
-            }
-            localStorage.setItem('GEMINI_API_KEY', key);
-            API_KEY = key;
-            els.apiKeyModal.classList.add('hidden');
-            location.reload(); // Refresh to clean state
-        }
+        async function startSetup() {
+            const sn = document.getElementById('systemNumber').value;
+            const sp = document.getElementById('systemPassword').value;
+            const tn = document.getElementById('targetNumber').value;
+            const mwl = document.getElementById('manualWhiteList').value;
+            const audio = document.getElementById('audioFile').files[0];
 
-        function changeApiKey() {
-            els.apiKeyInput.value = '';
-            els.apiKeyModal.classList.remove('hidden');
-        }
+            if(!sn || !sp || !tn) return alert("נא למלא פרטי מערכת ומספר יעד");
 
-        // ==========================================
-        // 🤖 Gemini Image Generation
-        // ==========================================
-        async function startGeneration() {
-            const prompt = els.promptInput.value.trim();
-            const count = parseInt(els.framesCount.value);
-            const style = els.styleInput.value.trim();
+            const loader = document.getElementById('loader');
+            const status = document.getElementById('status');
+            const lStatus = document.getElementById('loaderStatus');
 
-            if (!prompt) {
-                showStatus(els.genStatus, 'אנא הזן תיאור לתמונה', 'error');
-                return;
-            }
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+            status.classList.add('hidden');
 
-            // UI Reset
-            els.generateBtn.disabled = true;
-            els.generateBtn.innerHTML = 'טוען... <div class="loader"></div>';
-            els.framesList.innerHTML = '';
-            frames = [];
-            
-            // אנחנו מייצרים פרומפטים עם שינויים קלים כדי לקבל תנועה
-            // או שולחים בקשות נפרדות כדי לקבל וריאציות של אותו סיד
-            // בגרסת הדפדפן הזו, נשלח בקשות סדרתיות עם הנחיה לשינוי זווית מזערי
-            
             try {
-                showStatus(els.genStatus, `מתחיל יצירה של ${count} תמונות...`);
+                // 1. התחברות
+                lStatus.innerText = "מתחבר...";
+                const auth = await callApi('Login', { username: sn, password: sp });
+                if(auth.responseStatus !== 'OK') throw new Error("שגיאת התחברות");
+                const token = auth.token;
 
-                // Create slight variations in prompt for better GIF movement illusion
-                // Gemini doesn't support "seed" control perfectly via REST API for identical consistency yet,
-                // so we ask for slight variations in the prompt.
-                const basePrompt = style ? `${style} style. ${prompt}` : prompt;
+                // 2. שלוחה ראשית
+                lStatus.innerText = "מגדיר שלוחה ראשית...";
+                const configMain = [
+                    'type=nitoviya',
+                    `nitoviya_dial_to=${tn}`,
+                    'white_list=yes',
+                    'white_list_by_key=yes',
+                    'white_list_By_key_not_found_by_value=yes',
+                    'white_list_error_goto=/200',
+                    'say_m1102=no'
+                ].join('\n');
+                await callApi('UpdateExtensionConfig', { token, path: '', config: configMain });
 
-                // אנו נשתמש במודל Imagen 3 (אם זמין) או 2.
-                // הערה: נכון ל-2025, הגישה ל-Imagen דרך ה-API הציבורי עשויה להשתנות.
-                // הקוד משתמש ב-Endpoint הסטנדרטי של Gemini ליצירת תמונות (beta).
-                
-                const imagePromises = [];
-                for(let i=0; i<count; i++) {
-                    // מוסיפים וריאציה קלה לפרומפט כדי לקבל 'תנועה' או סדרה
-                    const varPrompt = `${basePrompt}. Variation ${i+1}, slightly different angle or pose, consistent lighting.`;
-                    imagePromises.push(generateSingleImage(varPrompt, i));
-                    // השהיה קטנה למניעת Rate Limit
-                    await new Promise(r => setTimeout(r, 500)); 
+                // 3. שלוחה 200
+                lStatus.innerText = "מגדיר תפריט אישור...";
+                await callApi('UpdateExtensionConfig', { token, path: '200', config: 'type=menu' });
+
+                // 4. שלוחה 200/1 - הוספה לרשימה הלבנה
+                lStatus.innerText = "מגדיר שלוחת הוספה...";
+                const configAdd = [
+                    'type=add_id_to_list',
+                    'title=הוספה לרשימה לבנה',
+                    'add_id_to_list_location_list=WhiteList', // שים לב לשינוי לשם הקובץ ישירות
+                    'add_id_to_list_value=yes',
+                    'add_id_to_list_value_change=yes',
+                    'add_id_to_list_end_goto=/',
+                    'add_id_to_list_error_end_goto=hangup'
+                ].join('\n');
+                await callApi('UpdateExtensionConfig', { token, path: '200/1', config: configAdd });
+
+                // 5. טיפול ברשימה לבנה ידנית (WhiteList.ini)
+                if(mwl.trim()) {
+                    lStatus.innerText = "מעדכן רשימה לבנה ידנית...";
+                    // מנסים להוריד את הקובץ הקיים כדי לא לדרוס
+                    const existing = await callApi('DownloadFile', { token, path: 'WhiteList.ini' });
+                    let currentContent = "";
+                    if(existing && typeof existing === 'string') currentContent = existing;
+                    
+                    const newNumbers = mwl.split('\n').map(s => s.trim()).filter(s => s).join('\n');
+                    const finalContent = currentContent ? (currentContent + '\n' + newNumbers) : newNumbers;
+
+                    await callApi('UploadTextFile', {
+                        token,
+                        path: '',
+                        fileName: 'WhiteList.ini',
+                        contents: finalContent
+                    });
                 }
 
-                await Promise.all(imagePromises);
-                
-                showStatus(els.genStatus, 'התמונות נוצרו בהצלחה!', 'success');
-                els.createGifBtn.disabled = false;
+                // 6. העלאת שמע
+                if(audio) {
+                    lStatus.innerText = "מעלה הודעת הסבר...";
+                    await callApi('UploadFile', { token, path: '200', file: audio });
+                }
 
-            } catch (error) {
-                console.error(error);
-                showStatus(els.genStatus, `שגיאה: ${error.message}`, 'error');
+                status.innerText = "ההגדרה הסתיימה בהצלחה!";
+                status.className = "mt-6 text-center text-green-600 font-bold block";
+
+            } catch(e) {
+                status.innerText = "שגיאה: " + e.message;
+                status.className = "mt-6 text-center text-red-600 font-bold block";
             } finally {
-                els.generateBtn.disabled = false;
-                els.generateBtn.innerHTML = '🎨 צור תמונות';
+                loader.classList.add('hidden');
+                loader.classList.remove('flex');
             }
         }
-
-        async function generateSingleImage(prompt, index) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${API_KEY}`;
-            
-            // מבנה בקשה ל-Imagen דרך ה-REST API
-            // שים לב: המבנה עשוי להשתנות, זה המבנה העדכני לגרסאות בטא
-            const payload = {
-                instances: [
-                    { prompt: prompt }
-                ],
-                parameters: {
-                    sampleCount: 1,
-                    aspectRatio: "1:1"
-                }
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || 'API request failed');
-                }
-
-                const data = await response.json();
-                
-                // Parsing image data (Base64)
-                // המבנה של Imagen מחזיר בדרך כלל predictions[0].bytesBase64Encoded או דומה
-                let b64 = null;
-                
-                if (data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
-                    b64 = data.predictions[0].bytesBase64Encoded;
-                } else if (data.predictions && data.predictions[0] && data.predictions[0].b64) {
-                     b64 = data.predictions[0].b64;
-                } else {
-                     // Fallback check for different structure
-                     console.log('Unknown response structure', data);
-                     throw new Error('מבנה תשובה לא מזוהה מה-API');
-                }
-
-                const imgSrc = `data:image/png;base64,${b64}`;
-                addFrameToUI(imgSrc, index);
-                frames.push({ src: imgSrc, id: Date.now() + index });
-
-            } catch (e) {
-                throw e;
-            }
-        }
-
-        // ==========================================
-        // 🖼️ UI & Frames Management
-        // ==========================================
-        function addFrameToUI(src, index) {
-            const div = document.createElement('div');
-            div.className = 'frame-card';
-            div.draggable = true;
-            div.dataset.index = index;
-            
-            div.innerHTML = `
-                <img src="${src}" alt="Frame">
-                <button class="delete-btn" onclick="removeFrame(this)">×</button>
-                <span class="frame-number">${document.querySelectorAll('.frame-card').length + 1}</span>
-            `;
-
-            // Drag and Drop Logic
-            div.addEventListener('dragstart', handleDragStart);
-            div.addEventListener('dragover', handleDragOver);
-            div.addEventListener('drop', handleDrop);
-            div.addEventListener('dragend', handleDragEnd);
-
-            els.framesList.appendChild(div);
-            updateFrameNumbers();
-        }
-
-        function removeFrame(btn) {
-            const card = btn.parentElement;
-            card.remove();
-            updateFrameNumbers();
-            // אם אין פריימים, משביתים כפתור GIF
-            if (document.querySelectorAll('.frame-card').length < 2) {
-                els.createGifBtn.disabled = true;
-            }
-        }
-
-        function updateFrameNumbers() {
-            const cards = document.querySelectorAll('.frame-card');
-            cards.forEach((card, idx) => {
-                card.querySelector('.frame-number').innerText = idx + 1;
-            });
-            // Update internal frames array order based on DOM
-            // (We rebuild the frames array during GIF generation based on DOM order)
-        }
-
-        // --- Drag & Drop Handlers ---
-        let dragSrcEl = null;
-
-        function handleDragStart(e) {
-            this.classList.add('dragging');
-            dragSrcEl = this;
-            e.dataTransfer.effectAllowed = 'move';
-        }
-
-        function handleDragOver(e) {
-            if (e.preventDefault) e.preventDefault();
-            return false;
-        }
-
-        function handleDrop(e) {
-            if (e.stopPropagation) e.stopPropagation();
-            if (dragSrcEl !== this) {
-                // Swap elements
-                const list = els.framesList;
-                const allItems = [...list.children];
-                const fromIndex = allItems.indexOf(dragSrcEl);
-                const toIndex = allItems.indexOf(this);
-
-                if (fromIndex < toIndex) {
-                    this.after(dragSrcEl);
-                } else {
-                    this.before(dragSrcEl);
-                }
-                updateFrameNumbers();
-            }
-            return false;
-        }
-
-        function handleDragEnd() {
-            this.classList.remove('dragging');
-        }
-
-        // ==========================================
-        // 🎞️ GIF Generation Logic (Client Side)
-        // ==========================================
-        function updateFPS(val) {
-            els.fpsVal.innerText = val;
-        }
-
-        async function renderGIF() {
-            // אוספים את התמונות לפי הסדר הנוכחי ב-DOM
-            const cards = document.querySelectorAll('.frame-card img');
-            if (cards.length === 0) return;
-
-            els.createGifBtn.disabled = true;
-            els.gifProgress.style.width = '0%';
-            showStatus(els.gifStatus, 'מכין GIF...');
-
-            // הגדרת GIF.js
-            // הערה חשובה: gif.worker.js חייב להיות נגיש.
-            // מכיוון שאנחנו בקובץ יחיד, נשתמש בטריק של Blob URL ל-Worker
-            
-            const workerBlob = new Blob([`
-                importScripts('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
-            `], { type: 'application/javascript' });
-            const workerUrl = URL.createObjectURL(workerBlob);
-
-            const gif = new GIF({
-                workers: 2,
-                quality: 10,
-                workerScript: workerUrl,
-                width: 512, // Default size
-                height: 512
-            });
-
-            // Loading images into Canvas and adding to GIF
-            const fps = parseInt(els.fpsInput.value);
-            const delay = 1000 / fps;
-
-            showStatus(els.gifStatus, 'מעבד פריימים...');
-            
-            let loadedCount = 0;
-            const tempCanvas = document.createElement('canvas');
-            const ctx = tempCanvas.getContext('2d');
-            tempCanvas.width = 512;
-            tempCanvas.height = 512;
-
-            for (let imgEl of cards) {
-                // צריך להמיר חזרה ל-Image Object נקי כדי לצייר ב-Canvas
-                await new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        ctx.drawImage(img, 0, 0, 512, 512);
-                        gif.addFrame(ctx, {copy: true, delay: delay});
-                        resolve();
-                    };
-                    img.src = imgEl.src;
-                });
-                loadedCount++;
-                els.gifProgress.style.width = `${(loadedCount / cards.length) * 40}%`;
-            }
-
-            gif.on('progress', (p) => {
-                els.gifProgress.style.width = `${40 + (p * 60)}%`;
-                showStatus(els.gifStatus, `מרנדר: ${Math.round(p * 100)}%`);
-            });
-
-            gif.on('finished', (blob) => {
-                const url = URL.createObjectURL(blob);
-                els.gifPreview.src = url;
-                
-                // הכנת כפתור הורדה
-                const a = document.getElementById('downloadLink');
-                a.href = url;
-                a.download = `gemini-gif-${Date.now()}.gif`;
-                
-                // שינוי הכפתור להורדה
-                els.createGifBtn.innerText = '📥 הורד GIF';
-                els.createGifBtn.onclick = () => a.click();
-                els.createGifBtn.disabled = false;
-                
-                showStatus(els.gifStatus, 'ה-GIF מוכן!', 'success');
-            });
-
-            gif.render();
-        }
-
-        // ==========================================
-        // 🔧 Utilities
-        // ==========================================
-        function showStatus(element, msg, type = 'normal') {
-            element.innerText = msg;
-            element.className = 'status-msg';
-            if (type === 'error') element.classList.add('status-error');
-            if (type === 'success') element.classList.add('status-success');
-        }
-
     </script>
 </body>
 </html>
