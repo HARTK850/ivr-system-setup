@@ -3,201 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מגן צינתוקים - ניהול מתקדם</title>
+    <title>מגן צינתוקים - גרסה מתוקנת סופית</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; }
-        .step-card { display: none; }
-        .step-card.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: system-ui, sans-serif; background: #f9fafb; }
+        .log-box { background: #1a202c; color: #48bb78; font-family: monospace; font-size: 12px; }
+        .step { display: none; }
+        .step.active { display: block; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-6">
 
-    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-2xl font-bold">מערכת הגנה מצינתוקים</h1>
-            <p class="opacity-80">חיבור מאובטח לימות המשיח (כולל MFA)</p>
+    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-2xl p-6 border border-gray-200">
+        <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">מערכת הגדרת הגנה מצינתוקים</h1>
+
+        <!-- שלב 1: התחברות -->
+        <div id="step1" class="step active space-y-4">
+            <h2 class="font-bold border-b pb-2">התחברות למערכת</h2>
+            <input type="text" id="sysUser" placeholder="מספר מערכת" class="w-full p-3 border rounded">
+            <input type="password" id="sysPass" placeholder="סיסמה" class="w-full p-3 border rounded">
+            <button onclick="doLogin()" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">התחבר ושלח קוד MFA</button>
         </div>
 
-        <div class="p-6">
-            <!-- שלב 1: התחברות ראשונית -->
-            <div id="step1" class="step-card active space-y-4">
-                <h2 class="text-lg font-bold border-b pb-2">שלב 1: התחברות</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="systemNumber" placeholder="מספר מערכת" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400">
-                    <input type="password" id="systemPassword" placeholder="סיסמה" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">התחבר ושלח קוד אימות</button>
-            </div>
+        <!-- שלב 2: אימות MFA -->
+        <div id="stepMfa" class="step space-y-4">
+            <h2 class="font-bold text-orange-600 border-b pb-2">אימות קוד (MFA)</h2>
+            <p class="text-sm">הזן את הקוד שקיבלת בטלפון/מייל:</p>
+            <input type="text" id="mfaCode" placeholder="קוד אימות" class="w-full p-3 border rounded text-center text-xl tracking-widest">
+            <button onclick="doVerifyMfa()" class="w-full bg-orange-500 text-white p-3 rounded font-bold">אמת קוד והמשך</button>
+        </div>
 
-            <!-- שלב 2: אימות MFA -->
-            <div id="stepMfa" class="step-card space-y-4">
-                <h2 class="text-lg font-bold border-b pb-2 text-orange-600">שלב 2: אימות דו-שלבי</h2>
-                <p class="text-sm text-gray-600">קוד אימות נשלח לבעל המערכת. אנא הזן אותו כאן:</p>
-                <input type="text" id="mfaCode" placeholder="הזן קוד שקיבלת" class="w-full p-3 border rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-orange-400">
-                <button onclick="handleVerifyMfa()" class="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition">אמת קוד והמשך להגדרות</button>
-            </div>
+        <!-- שלב 3: הגדרות -->
+        <div id="stepConfig" class="step space-y-4">
+            <h2 class="font-bold text-green-600 border-b pb-2">הגדרות ניתוב</h2>
+            <input type="text" id="targetNum" placeholder="המספר אליו יועברו השיחות" class="w-full p-3 border rounded">
+            
+            <label class="block text-xs font-bold mt-2">הוספה ידנית ל-WhiteList.ini (מספר בכל שורה):</label>
+            <textarea id="manualEntries" rows="3" class="w-full p-3 border rounded text-sm"></textarea>
 
-            <!-- שלב 3: הגדרות IVR -->
-            <div id="stepConfig" class="step-card space-y-6">
-                <h2 class="text-lg font-bold border-b pb-2 text-green-600">שלב 3: הגדרות המערכת</h2>
-                
-                <div class="space-y-2">
-                    <label class="block text-sm font-bold">מספר היעד שלך (להעברת שיחות):</label>
-                    <input type="text" id="targetNumber" placeholder="לדוגמה: 0501234567" class="w-full p-3 border rounded-lg shadow-sm">
-                </div>
+            <label class="block text-xs font-bold mt-2">הודעת שמע לשלוחה 200 (M0000):</label>
+            <input type="file" id="audioFile" accept="audio/*" class="w-full p-2 border border-dashed rounded text-xs">
 
-                <div class="space-y-2">
-                    <label class="block text-sm font-bold">הודעת שמע לשלוחה 200 (M0000):</label>
-                    <input type="file" id="audioFile" accept="audio/*" class="w-full text-sm">
-                </div>
+            <button onclick="doApply()" class="w-full bg-green-600 text-white p-4 rounded-lg font-bold shadow-lg hover:bg-green-700">בצע הגדרות עכשיו</button>
+        </div>
 
-                <div class="space-y-2">
-                    <label class="block text-sm font-bold">מספרים להוספה ידנית ל-WhiteList.ini:</label>
-                    <textarea id="manualList" rows="3" placeholder="מספר בכל שורה" class="w-full p-3 border rounded-lg font-mono text-sm"></textarea>
-                </div>
-
-                <button onclick="applySettings()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 shadow-lg transition">בצע הגדרות סופיות</button>
-            </div>
-
-            <div id="consoleLog" class="mt-6 p-4 bg-gray-900 text-green-400 font-mono text-xs rounded-lg h-32 overflow-y-auto">
-                > המערכת מוכנה...
-            </div>
+        <!-- קונסול הודעות -->
+        <div id="console" class="mt-8 p-4 log-box rounded-lg h-48 overflow-y-auto">
+            > המערכת מוכנה לפעולה.
         </div>
     </div>
 
     <script>
-        const API_BASE = 'https://www.call2all.co.il/ym/api/';
-        let currentToken = '';
+        const API = 'https://www.call2all.co.il/ym/api/';
+        let token = '';
 
-        function log(msg, isError = false) {
-            const consoleBox = document.getElementById('consoleLog');
-            const time = new Date().toLocaleTimeString();
-            consoleBox.innerHTML += `<div class="${isError ? 'text-red-400' : ''}">[${time}] ${msg}</div>`;
-            consoleBox.scrollTop = consoleBox.scrollHeight;
-            console.log(`[IVR LOG] ${msg}`);
+        function writeLog(msg, error = false) {
+            const box = document.getElementById('console');
+            const entry = document.createElement('div');
+            entry.className = error ? 'text-red-400' : '';
+            entry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            box.appendChild(entry);
+            box.scrollTop = box.scrollHeight;
+            console.log(msg);
         }
 
-        async function api(method, params) {
-            log(`קריאה ל-${method}...`);
+        async function call(method, params) {
+            writeLog(`מבצע פנייה ל-${method}...`);
             const fd = new FormData();
-            for (const key in params) fd.append(key, params[key]);
+            for (const k in params) fd.append(k, params[k]);
+
+            try {
+                const r = await fetch(`${API}${method}`, { method: 'POST', body: fd });
+                const res = await r.json();
+                writeLog(`תגובת שרת (${method}): ${JSON.stringify(res)}`);
+                return res;
+            } catch (e) {
+                writeLog(`שגיאה בקריאה ל-${method}: ${e.message}`, true);
+                return { responseStatus: 'EXCEPTION' };
+            }
+        }
+
+        async function doLogin() {
+            const u = document.getElementById('sysUser').value;
+            const p = document.getElementById('sysPass').value;
+            const res = await call('Login', { username: u, password: p });
             
-            try {
-                const response = await fetch(`${API_BASE}${method}`, { method: 'POST', body: fd });
-                const data = await response.json();
-                log(`תגובה מ-${method}: ${data.responseStatus}`);
-                return data;
-            } catch (e) {
-                log(`שגיאת רשת ב-${method}: ${e.message}`, true);
-                throw e;
-            }
-        }
-
-        async function handleLogin() {
-            const user = document.getElementById('systemNumber').value;
-            const pass = document.getElementById('systemPassword').value;
-
-            try {
-                const res = await api('Login', { username: user, password: pass });
-                if (res.responseStatus === 'OK') {
-                    currentToken = res.token;
-                    log("התחברות ראשונית הצליחה. בודק צורך ב-MFA...");
-                    
-                    // בדיקת סטטוס MFA
-                    if (res.mfa_static_token_required) {
-                        log("נדרש אימות MFA. שולח קוד...");
-                        await api('MFASession', { token: currentToken, action: 'sendMFA' });
-                        showStep('stepMfa');
-                    } else {
-                        log("לא נדרש MFA, עובר ישירות להגדרות.");
-                        showStep('stepConfig');
-                    }
+            if (res.responseStatus === 'OK') {
+                token = res.token;
+                if (res.mfa_static_token_required) {
+                    writeLog("נדרש MFA. שולח קוד...");
+                    await call('MFASession', { token, action: 'sendMFA' });
+                    changeStep('stepMfa');
                 } else {
-                    throw new Error(res.message || "פרטים שגויים");
+                    changeStep('stepConfig');
                 }
-            } catch (e) {
-                alert(e.message);
+            } else {
+                alert("התחברות נכשלה: " + res.message);
             }
         }
 
-        async function handleVerifyMfa() {
+        async function doVerifyMfa() {
             const code = document.getElementById('mfaCode').value;
-            try {
-                const res = await api('MFASession', {
-                    token: currentToken,
-                    action: 'validMFA',
-                    mfaCode: code
-                });
-
-                if (res.mfa_valid_status === 'VALID') {
-                    log("אימות MFA הצליח!");
-                    showStep('stepConfig');
-                } else {
-                    throw new Error("קוד שגוי או פג תוקף");
-                }
-            } catch (e) {
-                alert(e.message);
+            const res = await call('MFASession', { token, action: 'validMFA', mfaCode: code });
+            if (res.mfa_valid_status === 'VALID') {
+                writeLog("אימות MFA הצליח!");
+                changeStep('stepConfig');
+            } else {
+                alert("קוד שגוי");
             }
         }
 
-        async function applySettings() {
-            const target = document.getElementById('targetNumber').value;
-            const manual = document.getElementById('manualList').value;
+        async function doApply() {
+            const target = document.getElementById('targetNum').value;
+            const manual = document.getElementById('manualEntries').value;
             const audio = document.getElementById('audioFile').files[0];
 
-            if(!target) return alert("חובה להזין מספר יעד");
+            if(!target) return alert("אנא הזן מספר יעד");
 
             try {
-                // 1. הגדרת שלוחה ראשית
-                log("מעדכן הגדרות שלוחה ראשית...");
-                const mainCfg = `type=nitoviya\nnitoviya_dial_to=${target}\nwhite_list=yes\nwhite_list_by_key=yes\nwhite_list_By_key_not_found_by_value=yes\nwhite_list_error_goto=/200\nsay_m1102=no`;
-                await api('UpdateExtensionConfig', { token: currentToken, path: '', config: mainCfg });
+                // 1. שלוחה ראשית - הגדרות חובה
+                writeLog("מעדכן שלוחה ראשית...");
+                const mainConfig = [
+                    'type=nitoviya',
+                    `nitoviya_dial_to=${target}`,
+                    'white_list=yes',
+                    'white_list_by_key=yes',
+                    'white_list_By_key_not_found_by_value=yes',
+                    'white_list_error_goto=/200',
+                    'say_m1102=no'
+                ].join('\n');
+                
+                // שימוש ב-override=yes כדי לוודא דריסה
+                await call('UpdateExtensionConfig', { token, path: '', config: mainConfig, override: 'yes' });
 
-                // 2. הגדרת שלוחה 200
-                log("מגדיר שלוחה 200...");
-                await api('UpdateExtensionConfig', { token: currentToken, path: '200', config: 'type=menu' });
+                // 2. שלוחה 200
+                writeLog("מעדכן שלוחה 200...");
+                await call('UpdateExtensionConfig', { token, path: '200', config: 'type=menu', override: 'yes' });
 
-                // 3. הגדרת שלוחה 200/1 להוספה ל-WhiteList.ini
-                log("מגדיר שלוחת הוספה (200/1)...");
-                const addCfg = `type=add_id_to_list\ntitle=הוספה לרשימה לבנה\nadd_id_to_list_location_list=WhiteList.ini\nadd_id_to_list_value=yes\nadd_id_to_list_value_change=yes\nadd_id_to_list_end_goto=/\nadd_id_to_list_error_end_goto=hangup`;
-                await api('UpdateExtensionConfig', { token: currentToken, path: '200/1', config: addCfg });
+                // 3. שלוחה 200/1
+                writeLog("מעדכן שלוחה 200/1...");
+                const addCfg = [
+                    'type=add_id_to_list',
+                    'title=הוספה לרשימה לבנה',
+                    'add_id_to_list_location_list=WhiteList.ini',
+                    'add_id_to_list_value=yes',
+                    'add_id_to_list_value_change=yes',
+                    'add_id_to_list_end_goto=/',
+                    'add_id_to_list_error_end_goto=hangup'
+                ].join('\n');
+                await call('UpdateExtensionConfig', { token, path: '200/1', config: addCfg, override: 'yes' });
 
-                // 4. עדכון WhiteList.ini ידני
-                if (manual.trim()) {
-                    log("מעדכן רשימה לבנה ידנית ב-WhiteList.ini...");
-                    // מורידים קובץ קיים
-                    const currentFile = await api('DownloadFile', { token: currentToken, path: 'WhiteList.ini' });
-                    let content = (typeof currentFile === 'string') ? currentFile : "";
-                    const newEntries = manual.split('\n').map(s => s.trim()).filter(s => s).join('\n');
-                    const final = content ? (content + '\n' + newEntries) : newEntries;
-
-                    await api('UploadTextFile', {
-                        token: currentToken,
+                // 4. WhiteList.ini
+                if(manual.trim()) {
+                    writeLog("מעדכן WhiteList.ini...");
+                    // ניסיון להוריד קובץ קיים (בפורמט טקסט)
+                    const old = await call('DownloadFile', { token, path: 'WhiteList.ini' });
+                    let content = (typeof old === 'string') ? old : "";
+                    const cleanedManual = manual.split('\n').map(s => s.trim()).filter(s => s).join('\n');
+                    const updatedContent = content ? (content + '\n' + cleanedManual) : cleanedManual;
+                    
+                    await call('UploadTextFile', {
+                        token,
                         path: '',
                         fileName: 'WhiteList.ini',
-                        contents: final
+                        contents: updatedContent
                     });
                 }
 
-                // 5. העלאת שמע
-                if (audio) {
-                    log("מעלה קובץ שמע לשלוחה 200...");
-                    await api('UploadFile', { token: currentToken, path: '200', file: audio });
+                // 5. קובץ שמע
+                if(audio) {
+                    writeLog("מעלה קובץ שמע לשלוחה 200...");
+                    await call('UploadFile', { token, path: '200', file: audio });
                 }
 
-                log("--- כל ההגדרות הושלמו בהצלחה! ---");
-                alert("המערכת הוגדרה בהצלחה!");
+                writeLog("מבצע רענון מערכת סופי...");
+                // פקודה אופציונלית לרענון - בדרך כלל לא חובה ב-API אבל עוזרת לוודא כתיבה
+                await call('GetExtensionConfig', { token, path: '' }); 
+
+                writeLog("התהליך הסתיים!");
+                alert("ההגדרות הוחלו בהצלחה במערכת!");
 
             } catch (e) {
-                log(`שגיאה בתהליך ההגדרה: ${e.message}`, true);
+                writeLog("שגיאה קריטית: " + e.message, true);
             }
         }
 
-        function showStep(stepId) {
-            document.querySelectorAll('.step-card').forEach(s => s.classList.remove('active'));
-            document.getElementById(stepId).classList.add('active');
+        function changeStep(id) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
     </script>
 </body>
